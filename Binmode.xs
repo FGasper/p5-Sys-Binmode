@@ -8,11 +8,19 @@
 #define MYPKG "Sys::Binmode"
 #define HINT_KEY MYPKG "/enabled"
 
+/* dMARK alters the mark stack. We need to inspect that stack
+   without changing it. */
+#ifndef dMARK_TOPMARK
+    #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
+#endif
+
 #define MAKE_WRAPPER(OPID)                                  \
 Perl_check_t _old_checker_##OPID = NULL;                    \
                                                             \
 OP * _wrapped_pp_##OPID(pTHX) {                             \
-    dSP; dMARK; dORIGMARK;                                  \
+    dSP;                                                    \
+    dMARK_TOPMARK;                                                       \
+    dORIGMARK;                                              \
                                                             \
     while (++MARK <= SP) {                                  \
         if (SvPOK(*MARK)) sv_utf8_downgrade(*MARK, FALSE);  \
@@ -33,13 +41,6 @@ OP *_op_checker_##OPID(pTHX_ OP *op) {                      \
                                                             \
     return _old_checker_##OPID(aTHX_ op);                   \
 }
-
-#define MAKE_BOOT_WRAPPER(OPID) \
-wrap_op_checker(                \
-    OPID,                       \
-    _op_checker_##OPID,         \
-    &_old_checker_##OPID        \
-);
 
 MAKE_WRAPPER(OP_OPEN);
 MAKE_WRAPPER(OP_SYSOPEN);
@@ -122,6 +123,13 @@ static OP *_op_checker_OP_EXEC(pTHX_ OP *op) {
     return _old_checker_OP_EXEC(aTHX_ op);
 }
 */
+
+#define MAKE_BOOT_WRAPPER(OPID) \
+wrap_op_checker(                \
+    OPID,                       \
+    _op_checker_##OPID,         \
+    &_old_checker_##OPID        \
+);
 
 //----------------------------------------------------------------------
 
