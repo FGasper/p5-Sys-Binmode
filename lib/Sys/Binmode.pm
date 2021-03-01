@@ -125,9 +125,9 @@ C<no Sys::Binmode>, thus:
 C<chdir>, C<chmod>, C<chown>, C<chroot>, C<fcntl>, C<glob>, C<ioctl>,
 C<link>, C<lstat>, C<mkdir>, C<open>, C<opendir>, C<readlink>, C<rename>,
 C<rmdir>, C<select>, C<stat>, C<symlink>, C<sysopen>, C<truncate>,
-C<umask>, C<unlink>, C<utime>
+C<umask>, C<unlink>, and C<utime>
 
-=item * Certain socket functions: C<bind>, C<connect>, C<setsockopt>
+=item * C<bind>, C<connect>, and C<setsockopt>
 
 =item * C<gethostbyaddr> and C<getnetbyaddr>
 
@@ -141,6 +141,8 @@ C<umask>, C<unlink>, C<utime>
 
 =item * C<dbmopen> and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
+
+=item * There’s room for optimization, if that’s gainful.
 
 =item * Ideally this behaviour should be in Perl’s core distribution.
 
