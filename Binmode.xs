@@ -3,6 +3,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "ppport.h"
+
 #define MYPKG "Sys::Binmode"
 #define HINT_KEY MYPKG "/enabled"
 
