@@ -1,0 +1,15 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
+.github/workflows/windows.yml
+.gitignore
+.travis.yml
+Binmode.xs
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Sys/Binmode.pm
+ppport.h
+t/exec_and_system.t
+t/filesys.t
