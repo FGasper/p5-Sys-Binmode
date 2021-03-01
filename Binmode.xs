@@ -127,6 +127,8 @@ static OP *_op_checker_OP_EXEC(pTHX_ OP *op) {
 
 MODULE = Sys::Binmode     PACKAGE = Sys::Binmode
 
+PROTOTYPES: DISABLE
+
 BOOT:
 {
     MAKE_BOOT_WRAPPER(OP_OPEN);

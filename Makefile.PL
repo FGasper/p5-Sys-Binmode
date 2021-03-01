@@ -34,7 +34,6 @@ WriteMakefile(
 
     TEST_REQUIRES => {
         'Test::More' => 0,
-        'Test::Deep' => 0,
         'Test::FailWarnings' => 0,
         'File::Temp' => 0,
     },
