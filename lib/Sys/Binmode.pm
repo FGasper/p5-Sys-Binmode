@@ -70,8 +70,9 @@ If you apply this module injudiciously to existing code you may see
 exceptions thrown where previously things worked just fine. This can
 happen if you’ve neglected to encode one or more strings before
 sending them to the OS; if Perl has such a string stored upgraded then
-the OS will, under Perl’s default behaviour, receive a UTF-8-encoded
-version of that string.
+Perl will, under default behaviour, send a UTF-8-encoded
+version of that string to the OS. In essence, it’s an implicit
+UTF-8 auto-encode.
 
 The fix is to apply an explicit UTF-8 encode prior to the system call
 that throws the error. This is what we should do I<anyway>;
