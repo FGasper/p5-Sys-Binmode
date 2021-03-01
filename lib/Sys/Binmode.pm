@@ -192,6 +192,10 @@ sub unimport {
 
 #----------------------------------------------------------------------
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Leon Timmermans (LEONT) for some debugging help.
+
 =head1 LICENSE & COPYRIGHT
 
 Copyright 2021 Gasper Software Consulting. All rights reserved.

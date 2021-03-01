@@ -141,6 +141,10 @@ If you’d like them, ask.
 - Even more ideally, this behaviour should be Perl’s _default_.
 Maybe someday!
 
+# ACKNOWLEDGEMENTS
+
+Thanks to Leon Timmermans (LEONT) for some debugging help.
+
 # LICENSE & COPYRIGHT
 
 Copyright 2021 Gasper Software Consulting. All rights reserved.
