@@ -52,7 +52,9 @@ behaviour, which is categorically bad.
 # HOW THIS MODULE (PARTLY) FIXES THE PROBLEM
 
 This module provides predictable behaviour for Perl’s built-in functions by
-downgrading all strings before giving them to the operating system.
+downgrading all strings before giving them to the operating system. It’s
+equivalent to—but faster than!—prefixing your system calls with
+`utf8::downgrade()` (cf. [utf8](https://metacpan.org/pod/utf8)) on all arguments.
 
 Predictable behaviour is **always** a good thing; ergo, you should
 use this module in **all** new code.
@@ -91,9 +93,9 @@ So XS authors should also avoid the default typemap for such conversions.
 
 - This module will cause an exception to be thrown whenever
 an application tries to send a string with a >255 code point to the operating
-system. This is a **GOOD** **THING!** because it means you’ve neglected to
-encode your string appropriately for output, and Perl now points you to
-the bug.
+system. This exception is a **GOOD** **THING!** because it means you’ve
+neglected to encode your string appropriately for output, and Perl now
+points you to the bug.
 - This module works by replacing the affected ops’ default handlers
 with a wrapper function that downgrades the strings then calls the
 default handler. If, though, an op’s default handler was _already_
@@ -125,7 +127,7 @@ you can disable this module for a given block via
 `chdir`, `chmod`, `chown`, `chroot`, `fcntl`, `glob`, `ioctl`,
 `link`, `lstat`, `mkdir`, `open`, `opendir`, `readlink`, `rename`,
 `rmdir`, `select`, `stat`, `symlink`, `sysopen`, `truncate`,
-`umask`, `unlink`, and `utime`
+`umask`, `unlink`, `utime`
 - `bind`, `connect`, and `setsockopt`
 - `gethostbyaddr` and `getnetbyaddr`
 - `syscall`

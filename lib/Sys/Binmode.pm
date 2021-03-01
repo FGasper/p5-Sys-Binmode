@@ -59,7 +59,9 @@ behaviour, which is categorically bad.
 =head1 HOW THIS MODULE (PARTLY) FIXES THE PROBLEM
 
 This module provides predictable behaviour for Perl’s built-in functions by
-downgrading all strings before giving them to the operating system.
+downgrading all strings before giving them to the operating system. It’s
+equivalent to—but faster than!—prefixing your system calls with
+C<utf8::downgrade()> (cf. L<utf8>) on all arguments.
 
 Predictable behaviour is B<always> a good thing; ergo, you should
 use this module in B<all> new code.
@@ -100,9 +102,9 @@ So XS authors should also avoid the default typemap for such conversions.
 
 =item * This module will cause an exception to be thrown whenever
 an application tries to send a string with a >255 code point to the operating
-system. This is a B<GOOD> B<THING!> because it means you’ve neglected to
-encode your string appropriately for output, and Perl now points you to
-the bug.
+system. This exception is a B<GOOD> B<THING!> because it means you’ve
+neglected to encode your string appropriately for output, and Perl now
+points you to the bug.
 
 =item * This module works by replacing the affected ops’ default handlers
 with a wrapper function that downgrades the strings then calls the
@@ -141,7 +143,7 @@ C<no Sys::Binmode>, thus:
 C<chdir>, C<chmod>, C<chown>, C<chroot>, C<fcntl>, C<glob>, C<ioctl>,
 C<link>, C<lstat>, C<mkdir>, C<open>, C<opendir>, C<readlink>, C<rename>,
 C<rmdir>, C<select>, C<stat>, C<symlink>, C<sysopen>, C<truncate>,
-C<umask>, C<unlink>, and C<utime>
+C<umask>, C<unlink>, C<utime>
 
 =item * C<bind>, C<connect>, and C<setsockopt>
 
