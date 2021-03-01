@@ -25,10 +25,7 @@ utf8::encode($e_dblenc);
     my $pid = fork or do {
         use Sys::Binmode;
 
-        close STDOUT;
-        open STDOUT, '>', "$dir/stdout$salt";
-
-        exec { $^X } $^X, -e => 'print $ARGV[0]', '--', "$e_up";
+        exec { $^X } $^X, -e => "my \$fh; open \$fh, '>', '$dir/stdout$salt'; print \$fh \$ARGV[0]", '--', "$e_up";
         exit;
     };
 
