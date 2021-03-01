@@ -20,8 +20,8 @@ Sys::Binmode - A fix for Perl’s system call encoding bug.
     # Prints “é”:
     print $foo, $/;
 
-    # In vanilla Perl this prints mojibake, but with Sys::Binmode
-    # it prints “é”:
+    # In Perl 5.32 this may print mojibake,
+    # but with Sys::Binmode it always prints “é”:
     exec 'echo', $foo;
 
 =head1 DESCRIPTION
@@ -30,18 +30,19 @@ tl;dr: Use this module in B<all> new code. Seriously.
 
 =head1 BACKGROUND
 
-In Perl, an application doesn’t need to know how Perl stores a given
-string internally. Perl can thus store any Unicode code point while
+Ideally, a Perl application doesn’t need to know how the interpreter stores
+a given string internally. Perl can thus store any Unicode code point while
 still optimizing for size and speed when storing “bytes-compatible”
-strings—i.e., strings whose code points all lie below 256: “optimized”
-strings can only store code points 0-255 (but are faster and smaller),
-while “unoptimized” ones can store any Unicode code point.
+strings—i.e., strings whose code points all lie below 256. Perl’s
+“optimized” string storage format is faster and less memory-hungry, but it
+can only store code points 0-255. The “unoptimized” format, on the other
+hand, can store any Unicode code point.
 
 Of course, Perl doesn’t I<always> optimize “bytes-compatible” strings;
 Perl can also, if
 it wants, store such strings “unoptimized” (i.e., in Perl’s internal
 “loose UTF-8” format), too. For code points 0-127 there’s actually no
-difference between the two forms, but for 128-255 they differ. (cf.
+difference between the two forms, but for 128-255 the formats differ. (cf.
 L<perlunicode/The "Unicode Bug">) This means that anything that reads
 Perl’s internals B<MUST> differentiate between the two forms in order to
 use the string correctly.
@@ -52,7 +53,8 @@ differently depending on whether Perl has “optimized” that string or not.
 Remember, though, that Perl applications I<should> I<not> I<care> about
 Perl’s string storage internals. (This is why, for example, the L<bytes>
 pragma is discouraged.) But without that knowledge, the application can’t
-know what it actually says to the outside world!
+know what it actually says to the outside world! Thus we have unpredictable
+behaviour, which is categorically bad.
 
 =head1 HOW THIS MODULE (PARTLY) FIXES THE PROBLEM
 
@@ -61,6 +63,19 @@ downgrading all strings before giving them to the operating system.
 
 Predictable behaviour is B<always> a good thing; ergo, you should
 use this module in B<all> new code.
+
+=head1 CAVEATS
+
+If you apply this module injudiciously to existing code you may see
+exceptions thrown where previously things worked just fine. This can
+happen if you’ve neglected to encode one or more strings before
+sending them to the OS; if Perl has such a string stored upgraded then
+the OS will, under Perl’s default behaviour, receive a UTF-8-encoded
+version of that string.
+
+The fix is to apply an explicit UTF-8 encode prior to the system call
+that throws the error. This is what we should do I<anyway>;
+Sys::Binmode just enforces that better.
 
 =head1 WHERE ELSE THIS PROBLEM CAN APPEAR
 
