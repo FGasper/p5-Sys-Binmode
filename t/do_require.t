@@ -9,6 +9,8 @@ use Test::FailWarnings;
 use FindBin;
 push @INC, "$FindBin::Bin/assets";
 
+plan skip_all => 'Can’t find the assets.' if !(-e "$FindBin::Bin/assets/do-é.pl");
+
 my $e_up = "é";
 utf8::upgrade($e_up);
 

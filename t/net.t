@@ -10,6 +10,8 @@ use Socket;
 
 plan skip_all => "This test needs UNIX sockets. (Unavailable via Socket.pm on $^O)" if !Socket->can('AF_UNIX');
 
+plan skip_all => "Skipping on this OS ($^O)" if $^O !~ m<linux|darwin|bsd>;
+
 use File::Temp;
 
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
