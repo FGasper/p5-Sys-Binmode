@@ -1,4 +1,7 @@
 Revision history for Perl module Sys::Binmode
 
+0.02
+- (internal) Deduplicate %^H key
+
 0.01 Tue, 2 March 2021
 - original version

@@ -116,6 +116,8 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
+    HV *stash = gv_stashpv(MYPKG, FALSE);
+    newCONSTSUB(stash, "_HINT_KEY", newSVpvs(HINT_KEY));
 
     /* In theory this is for PL_check rather than PL_ppaddr, but per
        Paul Evans in practice this mutex gets used for other stuff, too.
