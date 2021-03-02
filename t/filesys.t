@@ -34,6 +34,45 @@ if ($^O =~ m<linux|darwin|bsd>i) {
 
     ok( (-e _get_path_up()), '-e with upgraded string' );
 
+    ok( (-r _get_path_up()), '-r with upgraded string' );
+    ok( (-R _get_path_up()), '-R with upgraded string' );
+    ok( (-w _get_path_up()), '-w with upgraded string' );
+    ok( (-W _get_path_up()), '-W with upgraded string' );
+    ok( (-o _get_path_up()), '-o with upgraded string' );
+    ok( (-O _get_path_up()), '-O with upgraded string' );
+
+    ok( (-f _get_path_up()), '-f with upgraded string' );
+    ok( defined(-d _get_path_up()), '-d with upgraded string' );
+    ok( defined(-l _get_path_up()), '-l with upgraded string' );
+    ok( defined(-p _get_path_up()), '-p with upgraded string' );
+
+    ok( defined(-u _get_path_up()), '-u with upgraded string' );
+    ok( defined(-g _get_path_up()), '-g with upgraded string' );
+    ok( defined(-k _get_path_up()), '-k with upgraded string' );
+
+    is(
+        (-x _get_path_up()),
+        q<>,
+        '-x with upgraded string',
+    );
+
+    is(
+        (-X _get_path_up()),
+        q<>,
+        '-X with upgraded string',
+    );
+
+    ok( (-z _get_path_up()), '-z with upgraded string' );
+    is( (-s _get_path_up()), 0, '-s with upgraded string' );
+
+    ok( defined(-M _get_path_up()), '-M with upgraded string' );
+    ok( defined(-A _get_path_up()), '-A with upgraded string' );
+    ok( defined(-C _get_path_up()), '-C with upgraded string' );
+
+    ok( defined(-S _get_path_up()), '-S with upgraded string' );
+    ok( defined(-b _get_path_up()), '-b with upgraded string' );
+    ok( defined(-c _get_path_up()), '-c with upgraded string' );
+
     ok(
         chmod( 0644, _get_path_up()),
         'chmod with upgraded string',
