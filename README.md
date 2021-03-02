@@ -59,7 +59,7 @@ equivalent to—but faster than!—prefixing your system calls with
 Predictable behaviour is **always** a good thing; ergo, you should
 use this module in **all** new code.
 
-# CAVEATS
+# CAVEAT: CHARACTER ENCODING
 
 If you apply this module injudiciously to existing code you may see
 exceptions thrown where previously things worked just fine. This can
@@ -73,16 +73,31 @@ The fix is to apply an explicit UTF-8 encode prior to the system call
 that throws the error. This is what we should do _anyway_;
 Sys::Binmode just enforces that better.
 
+## Windows (et alia)
+
+NTFS, Windows’s primary filesystem, expects filenames to be encoded in
+little-endian UTF-16. To create a file named `épée`, then, on NTFS
+you have to do something like:
+
+    my $windows_filename = Encode::Simple::encode( 'UTF-16LE', $filename );
+
+… where `$filename` is a character (i.e., decoded) string.
+
+Other OSes and filesystems may have their own quirks; regardless, this
+module gives you a saner point of departure to address those
+than Perl’s default behaviour provides.
+
 # WHERE ELSE THIS PROBLEM CAN APPEAR
 
-This problem is widespread in XS modules due to rampant
+The unpredictable-behaviour problem that this module fixes in core Perl is
+also common in XS modules due to rampant
 use of [the SvPV macro](https://perldoc.perl.org/perlapi#SvPV) and
 variants. SvPV is like the [bytes](https://metacpan.org/pod/bytes) pragma in C: it gives you the string’s
 internal bytes with no regard for what those bytes represent. XS authors
-_generally_ should **avoid** **SvPV** unless the C code in question ensures
-that the string is in the intended format.
-(If in doubt, prefer [SvPVbyte](https://perldoc.perl.org/perlapi#SvPVbyte)
-or [SvPVutf8](https://perldoc.perl.org/perlapi#SvPVutf8).)
+_generally_ should prefer
+[SvPVbyte](https://perldoc.perl.org/perlapi#SvPVbyte)
+or [SvPVutf8](https://perldoc.perl.org/perlapi#SvPVutf8) in lieu of
+SvPV unless the C code in question deals with Perl’s encoding abstraction.
 
 Note in particular that, as of Perl 5.32, the default XS typemap converts
 scalars to C `char *` and `const char *` via an SvPV variant. This means
@@ -91,11 +106,11 @@ So XS authors should also avoid the default typemap for such conversions.
 
 # LIMITATIONS
 
-- This module will cause an exception to be thrown whenever
+- This module will throw an exception whenever
 an application tries to send a string with a >255 code point to the operating
 system. This exception is a **GOOD** **THING!** because it means you’ve
 neglected to encode your string appropriately for output, and Perl now
-points you to the bug.
+points you to the bug. (Alas, this doesn’t catch _all_ such cases, but hey.)
 - This module works by replacing the affected ops’ default handlers
 with a wrapper function that downgrades the strings then calls the
 default handler. If, though, an op’s default handler was _already_
@@ -124,9 +139,9 @@ you can disable this module for a given block via
 - `exec` and `system`
 - `do` and `require`
 - File tests (e.g., `-e`) and the following:
-`chdir`, `chmod`, `chown`, `chroot`, `fcntl`, `glob`, `ioctl`,
+`chdir`, `chmod`, `chown`, `chroot`,
 `link`, `lstat`, `mkdir`, `open`, `opendir`, `readlink`, `rename`,
-`rmdir`, `select`, `stat`, `symlink`, `sysopen`, `truncate`,
+`rmdir`, `stat`, `symlink`, `sysopen`, `truncate`,
 `umask`, `unlink`, `utime`
 - `bind`, `connect`, and `setsockopt`
 - `gethostbyaddr` and `getnetbyaddr`

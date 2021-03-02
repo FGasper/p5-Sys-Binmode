@@ -11,5 +11,10 @@ Makefile.PL
 README.md
 lib/Sys/Binmode.pm
 ppport.h
+"t/assets/do-\303\251.pl"
+"t/assets/require-\303\251.pl"
+t/do_require.t
 t/exec_and_system.t
 t/filesys.t
+t/net.t
+t/unimport.t
