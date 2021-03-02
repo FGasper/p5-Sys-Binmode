@@ -50,6 +50,9 @@ if ($^O =~ m<linux|darwin|bsd>i) {
     ok( defined(-g _get_path_up()), '-g with upgraded string' );
     ok( defined(-k _get_path_up()), '-k with upgraded string' );
 
+    ok( defined(-T _get_path_up()), '-T with upgraded string' );
+    ok( defined(-B _get_path_up()), '-B with upgraded string' );
+
     is(
         (-x _get_path_up()),
         q<>,
@@ -143,6 +146,15 @@ if ($^O =~ m<linux|darwin|bsd>i) {
         unlink( _get_path_up() ),
         'unlink with upgraded string',
     );
+
+    mkdir( _get_path_up() . '-dir' );
+
+    ok(
+        chdir( _get_path_up() . '-dir' ),
+        'chdir with upgraded string',
+    );
+
+    chdir '/';
 }
 else {
     diag "Skipping most tests on this OS ($^O).";
