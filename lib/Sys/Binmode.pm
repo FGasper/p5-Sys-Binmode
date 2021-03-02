@@ -173,7 +173,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.01_02';
+our $VERSION = '0.01_03';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -194,7 +194,8 @@ sub unimport {
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Leon Timmermans (LEONT) for some debugging help.
+Thanks to Leon Timmermans (LEONT) and Paul Evans (PEVANS) for some
+debugging and design help.
 
 =head1 LICENSE & COPYRIGHT
 

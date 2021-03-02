@@ -147,7 +147,8 @@ Maybe someday!
 
 # ACKNOWLEDGEMENTS
 
-Thanks to Leon Timmermans (LEONT) for some debugging help.
+Thanks to Leon Timmermans (LEONT) and Paul Evans (PEVANS) for some
+debugging and design help.
 
 # LICENSE & COPYRIGHT
 
