@@ -168,8 +168,6 @@ C<unlink>, C<utime>
 
 =item * C<bind>, C<connect>, and C<setsockopt>
 
-=item * C<gethostbyaddr> and C<getnetbyaddr>
-
 =item * C<syscall>
 
 =back

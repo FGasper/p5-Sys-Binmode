@@ -102,27 +102,8 @@ MAKE_WRAPPER(OP_GHBYADDR);
 MAKE_WRAPPER(OP_GNBYADDR);
 
 MAKE_WRAPPER(OP_SYSCALL);
-/*
-Perl_check_t _old_checker_OP_EXEC = NULL;
 
-static OP * _wrapped_pp_OP_EXEC(pTHX) {
-    dSP; dMARK; dORIGMARK;
-
-    while (++MARK <= SP) {
-        if (SvPOK(*MARK)) sv_utf8_downgrade(*MARK, FALSE);
-    }
-
-    MARK = ORIGMARK;
-
-    return PL_ppaddr[OP_EXEC](aTHX);
-}
-
-static OP *_op_checker_OP_EXEC(pTHX_ OP *op) {
-    op->op_ppaddr = _wrapped_pp_OP_EXEC;
-
-    return _old_checker_OP_EXEC(aTHX_ op);
-}
-*/
+/* ---------------------------------------------------------------------- */
 
 #define MAKE_BOOT_WRAPPER(OPID) \
 wrap_op_checker(                \
@@ -195,8 +176,10 @@ BOOT:
     MAKE_BOOT_WRAPPER(OP_REQUIRE);
     MAKE_BOOT_WRAPPER(OP_DOFILE);
 
+    /* (These appear to be fine already.)
     MAKE_BOOT_WRAPPER(OP_GHBYADDR);
     MAKE_BOOT_WRAPPER(OP_GNBYADDR);
+    */
 
     MAKE_BOOT_WRAPPER(OP_SYSCALL);
 }
