@@ -49,9 +49,12 @@ utf8::encode($e_dblenc);
     # We want this exec to fail, so ignore Perl’s warning about it:
     no warnings 'exec';
 
-    exec { "$dir/$e_up" } "$dir/$e_up";
-
-    is( 0 + $!, Errno::ENOENT, 'exec looks for the right file' );
+    if ( exec { "$dir/$e_up" } "$dir/$e_up" ) {
+        fail 'exec should fail here!';
+    }
+    else {
+        is( 0 + $!, Errno::ENOENT, 'exec looks for the right file' );
+    }
 }
 
 die 'downgraded??' if !utf8::is_utf8($e_up);
