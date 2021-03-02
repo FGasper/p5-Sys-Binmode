@@ -40,7 +40,14 @@ if (length $rcvbuf_bin == 4) {
     my $rcvbuf_bin = getsockopt($s, SOL_SOCKET, SO_RCVBUF);
     my $rcvbuf2= unpack 'L', $rcvbuf_bin;
 
-    is( $rcvbuf2, $rcvbuf, 'setsockopt took effect');
+    if ($^O =~ m<linux>) {
+
+        # Linux doubles the SO_RCVBUF that you give. (weird?)
+        is( $rcvbuf2, 2 * $rcvbuf, 'setsockopt took effect');
+    }
+    else {
+        is( $rcvbuf2, $rcvbuf, 'setsockopt took effect');
+    }
 }
 
 done_testing;
