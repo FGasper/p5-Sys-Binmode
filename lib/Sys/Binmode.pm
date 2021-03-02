@@ -9,6 +9,8 @@ use warnings;
 
 Sys::Binmode - A fix for Perl’s system call encoding bug.
 
+<a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' /></a>
+
 =head1 SYNOPSIS
 
     use Sys::Binmode;
@@ -158,7 +160,7 @@ C<no Sys::Binmode>, thus:
 C<chdir>, C<chmod>, C<chown>, C<chroot>,
 C<link>, C<lstat>, C<mkdir>, C<open>, C<opendir>, C<readlink>, C<rename>,
 C<rmdir>, C<stat>, C<symlink>, C<sysopen>, C<truncate>,
-C<umask>, C<unlink>, C<utime>
+C<unlink>, C<utime>
 
 =item * C<bind>, C<connect>, and C<setsockopt>
 

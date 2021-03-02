@@ -2,6 +2,8 @@
 
 Sys::Binmode - A fix for Perl’s system call encoding bug.
 
+&lt;a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'>&lt;img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' />&lt;/a>
+
 # SYNOPSIS
 
     use Sys::Binmode;
@@ -142,7 +144,7 @@ you can disable this module for a given block via
 `chdir`, `chmod`, `chown`, `chroot`,
 `link`, `lstat`, `mkdir`, `open`, `opendir`, `readlink`, `rename`,
 `rmdir`, `stat`, `symlink`, `sysopen`, `truncate`,
-`umask`, `unlink`, `utime`
+`unlink`, `utime`
 - `bind`, `connect`, and `setsockopt`
 - `gethostbyaddr` and `getnetbyaddr`
 - `syscall`
