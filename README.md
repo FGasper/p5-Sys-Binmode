@@ -1,6 +1,6 @@
 # NAME
 
-Sys::Binmode - A fix for Perl’s system call encoding bug.
+Sys::Binmode - Fix Perl’s system call character encoding.
 
 <div>
     <a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' /></a>
@@ -47,11 +47,15 @@ use the string correctly.
 Alas, that differentiation doesn’t always happen. Thus, Perl can
 output a string that stores one or more 128-255 code points
 differently depending on whether Perl has “optimized” that string or not.
-Remember, though, that Perl applications _should_ _not_ _care_ about
+
+Remember, though: Perl applications _should_ _not_ _care_ about
 Perl’s string storage internals. (This is why, for example, the [bytes](https://metacpan.org/pod/bytes)
-pragma is discouraged.) But without that knowledge, the application can’t
-know what it actually says to the outside world! Thus we have unpredictable
-behaviour, which is categorically bad.
+pragma is discouraged.) The catch, though, is that without that knowledge,
+**the** **application** **can’t** **know** **what** **it** **actually** **says**
+**to** **the** **outside** **world!**
+
+Thus, applications must either monitor Perl’s string-storage internals
+or accept unpredictable behaviour, both of which are categorically bad.
 
 # HOW THIS MODULE (PARTLY) FIXES THE PROBLEM
 
@@ -119,6 +123,8 @@ you can disable this module for a given block via
     system 'echo', $foo;        # predictable/sane/happy
 
     {
+
+        # You should probably explain here why you’re doing this.
         no Sys::Binmode;
 
         system 'echo', $foo;    # nasal demons
@@ -142,7 +148,7 @@ you can disable this module for a given block via
 If you’d like them, ask.
 - There’s room for optimization, if that’s gainful.
 - Ideally this behaviour should be in Perl’s core distribution.
-- Even more ideally, this behaviour should be Perl’s _default_.
+- Even more ideally, Perl should adopt this behaviour as _default_.
 Maybe someday!
 
 # ACKNOWLEDGEMENTS

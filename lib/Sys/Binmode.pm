@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-Sys::Binmode - A fix for Perl’s system call encoding bug.
+Sys::Binmode - Fix Perl’s system call character encoding.
 
 =begin html
 
@@ -56,11 +56,15 @@ use the string correctly.
 Alas, that differentiation doesn’t always happen. Thus, Perl can
 output a string that stores one or more 128-255 code points
 differently depending on whether Perl has “optimized” that string or not.
-Remember, though, that Perl applications I<should> I<not> I<care> about
+
+Remember, though: Perl applications I<should> I<not> I<care> about
 Perl’s string storage internals. (This is why, for example, the L<bytes>
-pragma is discouraged.) But without that knowledge, the application can’t
-know what it actually says to the outside world! Thus we have unpredictable
-behaviour, which is categorically bad.
+pragma is discouraged.) The catch, though, is that without that knowledge,
+B<the> B<application> B<can’t> B<know> B<what> B<it> B<actually> B<says>
+B<to> B<the> B<outside> B<world!>
+
+Thus, applications must either monitor Perl’s string-storage internals
+or accept unpredictable behaviour, both of which are categorically bad.
 
 =head1 HOW THIS MODULE (PARTLY) FIXES THE PROBLEM
 
@@ -128,6 +132,8 @@ C<no Sys::Binmode>, thus:
     system 'echo', $foo;        # predictable/sane/happy
 
     {
+
+        # You should probably explain here why you’re doing this.
         no Sys::Binmode;
 
         system 'echo', $foo;    # nasal demons
@@ -164,7 +170,7 @@ If you’d like them, ask.
 
 =item * Ideally this behaviour should be in Perl’s core distribution.
 
-=item * Even more ideally, this behaviour should be Perl’s I<default>.
+=item * Even more ideally, Perl should adopt this behaviour as I<default>.
 Maybe someday!
 
 =back
