@@ -25,7 +25,7 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
-    if (svp && svp != &PL_sv_placeholder) {                 \
+    if (svp != &PL_sv_placeholder) {                        \
         dSP;                                                \
         dMARK_TOPMARK;                                      \
         dORIGMARK;                                          \
