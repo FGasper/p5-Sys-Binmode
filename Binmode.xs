@@ -5,6 +5,8 @@
 
 #include "ppport.h"
 
+static Perl_ppaddr_t MY_PL_ppaddr[OP_max];
+
 #define MYPKG "Sys::Binmode"
 #define HINT_KEY MYPKG "/enabled"
 
@@ -15,31 +17,22 @@
 #endif
 
 #define MAKE_WRAPPER(OPID)                                  \
-Perl_check_t _old_checker_##OPID = NULL;                    \
-                                                            \
-OP * _wrapped_pp_##OPID(pTHX) {                             \
-    dSP;                                                    \
-    dMARK_TOPMARK;                                          \
-    dORIGMARK;                                              \
-                                                            \
-    while (++MARK <= SP) {                                  \
-        if (SvPOK(*MARK)) sv_utf8_downgrade(*MARK, FALSE);  \
-    }                                                       \
-                                                            \
-    MARK = ORIGMARK;                                        \
-                                                            \
-    return PL_ppaddr[OPID](aTHX);                           \
-}                                                           \
-                                                            \
-OP *_op_checker_##OPID(pTHX_ OP *op) {                      \
+static OP* _wrapped_pp_##OPID(pTHX) {                       \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp && svp != &PL_sv_placeholder) {                 \
-        if (op->op_ppaddr != PL_ppaddr[OPID]) croak("%s: refusing to clobber already-modified %s handler (op_ppaddr)!", MYPKG, OP_NAME(op)); \
-        op->op_ppaddr = _wrapped_pp_##OPID;                 \
+        dSP;                                                \
+        dMARK_TOPMARK;                                      \
+        dORIGMARK;                                          \
+                                                            \
+        while (++MARK <= SP)                                \
+            if (SvPOK(*MARK))                               \
+                sv_utf8_downgrade(*MARK, FALSE);            \
+                                                            \
+        MARK = ORIGMARK;                                    \
     }                                                       \
                                                             \
-    return _old_checker_##OPID(aTHX_ op);                   \
+    return MY_PL_ppaddr[OPID](aTHX);                        \
 }
 
 MAKE_WRAPPER(OP_OPEN);
@@ -98,19 +91,17 @@ MAKE_WRAPPER(OP_OPEN_DIR);
 MAKE_WRAPPER(OP_REQUIRE);
 MAKE_WRAPPER(OP_DOFILE);
 
+/* (These appear to be fine already.)
 MAKE_WRAPPER(OP_GHBYADDR);
 MAKE_WRAPPER(OP_GNBYADDR);
+*/
 
 MAKE_WRAPPER(OP_SYSCALL);
 
 /* ---------------------------------------------------------------------- */
 
 #define MAKE_BOOT_WRAPPER(OPID) \
-wrap_op_checker(                \
-    OPID,                       \
-    _op_checker_##OPID,         \
-    &_old_checker_##OPID        \
-);
+PL_ppaddr[OPID] = _wrapped_pp_##OPID
 
 //----------------------------------------------------------------------
 
@@ -120,6 +111,9 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
+    unsigned i;
+    for (i=0; i<OP_max; i++) MY_PL_ppaddr[i] = PL_ppaddr[i];
+
     MAKE_BOOT_WRAPPER(OP_OPEN);
     MAKE_BOOT_WRAPPER(OP_SYSOPEN);
     MAKE_BOOT_WRAPPER(OP_TRUNCATE);

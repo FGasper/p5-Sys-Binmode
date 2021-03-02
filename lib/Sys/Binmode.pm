@@ -117,24 +117,6 @@ scalars to C C<char *> and C<const char *> via an SvPV variant. This means
 that any module that uses that conversion logic also has this problem.
 So XS authors should also avoid the default typemap for such conversions.
 
-=head1 LIMITATIONS
-
-=over
-
-=item * This module will throw an exception whenever
-an application tries to send a string with a >255 code point to the operating
-system. This exception is a B<GOOD> B<THING!> because it means you’ve
-neglected to encode your string appropriately for output, and Perl now
-points you to the bug. (Alas, this doesn’t catch I<all> such cases, but hey.)
-
-=item * This module works by replacing the affected ops’ default handlers
-with a wrapper function that downgrades the strings then calls the
-default handler. If, though, an op’s default handler was I<already>
-overwritten, we don’t want to clobber that. This will trigger a compile-time
-exception. Hopefully this can be fixed later.
-
-=back
-
 =head1 LEXICAL SCOPING
 
 If, for some reason, you I<want> Perl’s unpredictable default behaviour,
