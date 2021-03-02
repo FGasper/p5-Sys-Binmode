@@ -8,8 +8,8 @@
 #define MYPKG "Sys::Binmode"
 #define HINT_KEY MYPKG "/enabled"
 
-/* dMARK alters the mark stack. We need to inspect that stack
-   without changing it. */
+/* An idempotent variant of dMARK that allows us to inspect the
+   mark stack without changing it: */
 #ifndef dMARK_TOPMARK
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
@@ -19,7 +19,7 @@ Perl_check_t _old_checker_##OPID = NULL;                    \
                                                             \
 OP * _wrapped_pp_##OPID(pTHX) {                             \
     dSP;                                                    \
-    dMARK_TOPMARK;                                                       \
+    dMARK_TOPMARK;                                          \
     dORIGMARK;                                              \
                                                             \
     while (++MARK <= SP) {                                  \
@@ -35,7 +35,7 @@ OP *_op_checker_##OPID(pTHX_ OP *op) {                      \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp && svp != &PL_sv_placeholder) {                 \
-        if (op->op_ppaddr != PL_ppaddr[OPID]) croak("%s: refusing to clobber already-modified %s handler!", MYPKG, OP_NAME(op)); \
+        if (op->op_ppaddr != PL_ppaddr[OPID]) croak("%s: refusing to clobber already-modified %s handler (op_ppaddr)!", MYPKG, OP_NAME(op)); \
         op->op_ppaddr = _wrapped_pp_##OPID;                 \
     }                                                       \
                                                             \

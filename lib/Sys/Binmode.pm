@@ -32,7 +32,7 @@ Sys::Binmode - A fix for Perl’s system call encoding bug.
 
 =head1 DESCRIPTION
 
-tl;dr: Use this module in B<all> new code. Seriously.
+tl;dr: You I<probably> should use this module in B<all> new code.
 
 =head1 BACKGROUND
 
@@ -131,8 +131,7 @@ points you to the bug. (Alas, this doesn’t catch I<all> such cases, but hey.)
 with a wrapper function that downgrades the strings then calls the
 default handler. If, though, an op’s default handler was I<already>
 overwritten, we don’t want to clobber that. This will trigger a compile-time
-exception. (It I<may> be possible to accommodate such cases, but currently
-that doesn’t happen.)
+exception. Hopefully this can be fixed later.
 
 =back
 
@@ -176,6 +175,9 @@ C<unlink>, C<utime>
 
 =over
 
+=item * Teach this module to play nicely with other things that overwrite
+op handlers. (See L</LIMITATIONS> above.)
+
 =item * C<dbmopen> and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 
@@ -192,7 +194,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.01_01';
+our $VERSION = '0.01_02';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);

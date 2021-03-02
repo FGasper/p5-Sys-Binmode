@@ -23,7 +23,7 @@ Sys::Binmode - A fix for Perl’s system call encoding bug.
 
 # DESCRIPTION
 
-tl;dr: Use this module in **all** new code. Seriously.
+tl;dr: You _probably_ should use this module in **all** new code.
 
 # BACKGROUND
 
@@ -119,8 +119,7 @@ points you to the bug. (Alas, this doesn’t catch _all_ such cases, but hey.)
 with a wrapper function that downgrades the strings then calls the
 default handler. If, though, an op’s default handler was _already_
 overwritten, we don’t want to clobber that. This will trigger a compile-time
-exception. (It _may_ be possible to accommodate such cases, but currently
-that doesn’t happen.)
+exception. Hopefully this can be fixed later.
 
 # LEXICAL SCOPING
 
@@ -152,6 +151,8 @@ you can disable this module for a given block via
 
 # TODO
 
+- Teach this module to play nicely with other things that overwrite
+op handlers. (See ["LIMITATIONS"](#limitations) above.)
 - `dbmopen` and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 - There’s room for optimization, if that’s gainful.
