@@ -5,7 +5,12 @@
 
 #include "ppport.h"
 
-static Perl_ppaddr_t MY_PL_ppaddr[OP_max];
+/* A duplicate of PL_ppaddr as we find it at BOOT time.
+   We can thus overwrite PL_ppaddr with our own wrapper functions.
+   This interacts better with wrap_op_checker(), which doesn’t provide
+   a good way to call the op’s (now-overwritten) op_ppaddr callback.
+*/
+static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
 
 #define MYPKG "Sys::Binmode"
 #define HINT_KEY MYPKG "/enabled"
@@ -32,7 +37,7 @@ static OP* _wrapped_pp_##OPID(pTHX) {                       \
         MARK = ORIGMARK;                                    \
     }                                                       \
                                                             \
-    return MY_PL_ppaddr[OPID](aTHX);                        \
+    return ORIG_PL_ppaddr[OPID](aTHX);                        \
 }
 
 MAKE_WRAPPER(OP_OPEN);
@@ -101,7 +106,7 @@ MAKE_WRAPPER(OP_SYSCALL);
 /* ---------------------------------------------------------------------- */
 
 #define MAKE_BOOT_WRAPPER(OPID) \
-PL_ppaddr[OPID] = _wrapped_pp_##OPID
+PL_ppaddr[OPID] = _wrapped_pp_##OPID;
 
 //----------------------------------------------------------------------
 
@@ -111,8 +116,14 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
+
+    /* In theory this is for PL_check rather than PL_ppaddr, but per
+       Paul Evans in practice this mutex gets used for other stuff, too.
+    */
+    OP_CHECK_MUTEX_LOCK;
+
     unsigned i;
-    for (i=0; i<OP_max; i++) MY_PL_ppaddr[i] = PL_ppaddr[i];
+    for (i=0; i<OP_max; i++) ORIG_PL_ppaddr[i] = PL_ppaddr[i];
 
     MAKE_BOOT_WRAPPER(OP_OPEN);
     MAKE_BOOT_WRAPPER(OP_SYSOPEN);
@@ -176,4 +187,6 @@ BOOT:
     */
 
     MAKE_BOOT_WRAPPER(OP_SYSCALL);
+
+    OP_CHECK_MUTEX_UNLOCK;
 }
