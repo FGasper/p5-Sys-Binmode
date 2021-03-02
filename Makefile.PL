@@ -16,7 +16,7 @@ WriteMakefile(
     INC               => '-Wall -I.', # e.g., '-I. -I/usr/include/other'
     LICENSE           => "perl_5",
 
-    MIN_PERL_VERSION => '5.8.0',
+    MIN_PERL_VERSION => '5.14.0',
 
     META_MERGE => {
         'meta-spec' => { version => 2 },

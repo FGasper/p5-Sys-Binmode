@@ -115,14 +115,17 @@ MODULE = Sys::Binmode     PACKAGE = Sys::Binmode
 PROTOTYPES: DISABLE
 
 BOOT:
-{
     HV *stash = gv_stashpv(MYPKG, FALSE);
     newCONSTSUB(stash, "_HINT_KEY", newSVpvs(HINT_KEY));
 
     /* In theory this is for PL_check rather than PL_ppaddr, but per
        Paul Evans in practice this mutex gets used for other stuff, too.
+       Paul says a race here should be exceptionally rare, so for pre-5.16
+       perls (which lack this mutex) let’s just skip it.
     */
+#ifdef OP_CHECK_MUTEX_LOCK
     OP_CHECK_MUTEX_LOCK;
+#endif
 
     unsigned i;
     for (i=0; i<OP_max; i++) ORIG_PL_ppaddr[i] = PL_ppaddr[i];
@@ -189,6 +192,6 @@ BOOT:
     */
 
     MAKE_BOOT_WRAPPER(OP_SYSCALL);
-
+#ifdef OP_CHECK_MUTEX_UNLOCK
     OP_CHECK_MUTEX_UNLOCK;
-}
+#endif
