@@ -2,7 +2,9 @@
 
 Sys::Binmode - A fix for Perl’s system call encoding bug.
 
-&lt;a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'>&lt;img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' />&lt;/a>
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
 
 # SYNOPSIS
 

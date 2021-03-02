@@ -9,7 +9,11 @@ use warnings;
 
 Sys::Binmode - A fix for Perl’s system call encoding bug.
 
+=begin html
+
 <a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 =head1 SYNOPSIS
 
