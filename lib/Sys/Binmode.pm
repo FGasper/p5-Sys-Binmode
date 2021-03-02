@@ -157,9 +157,6 @@ C<unlink>, C<utime>
 
 =over
 
-=item * Teach this module to play nicely with other things that overwrite
-op handlers. (See L</LIMITATIONS> above.)
-
 =item * C<dbmopen> and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 

@@ -138,8 +138,6 @@ you can disable this module for a given block via
 
 # TODO
 
-- Teach this module to play nicely with other things that overwrite
-op handlers. (See ["LIMITATIONS"](#limitations) above.)
 - `dbmopen` and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 - There’s room for optimization, if that’s gainful.
