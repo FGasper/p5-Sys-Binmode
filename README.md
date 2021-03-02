@@ -148,7 +148,6 @@ you can disable this module for a given block via
 `rmdir`, `stat`, `symlink`, `sysopen`, `truncate`,
 `unlink`, `utime`
 - `bind`, `connect`, and `setsockopt`
-- `gethostbyaddr` and `getnetbyaddr`
 - `syscall`
 
 # TODO
