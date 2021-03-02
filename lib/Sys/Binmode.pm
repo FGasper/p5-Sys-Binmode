@@ -179,7 +179,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.01_03';
+our $VERSION = '0.01';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
