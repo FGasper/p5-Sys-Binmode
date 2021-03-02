@@ -32,7 +32,7 @@ Sys::Binmode - Fix Perl’s system call character encoding.
 
 =head1 DESCRIPTION
 
-tl;dr: You I<probably> should use this module in B<all> new code.
+tl;dr: Use this module in B<all> new code.
 
 =head1 BACKGROUND
 
