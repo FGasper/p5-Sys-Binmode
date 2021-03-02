@@ -19,15 +19,15 @@ Sys::Binmode - Fix Perl’s system call character encoding.
 
     use Sys::Binmode;
 
-    my $foo = "é";
+    my $foo = "\xc3\xa9";   # é in UTF-8
     $foo .= "\x{100}";
     chop $foo;
 
-    # Prints “é”:
+    # Prints “é” in UTF-8:
     print $foo, $/;
 
-    # In Perl 5.32 this may print mojibake,
-    # but with Sys::Binmode it always prints “é”:
+    # In Perl 5.32 this may print a double-UTF-8-encoded “é”,
+    # but with Sys::Binmode it always prints plain UTF-8 “é”:
     exec 'echo', $foo;
 
 =head1 DESCRIPTION
@@ -90,17 +90,14 @@ The fix is to apply an explicit UTF-8 encode prior to the system call
 that throws the error. This is what we should do I<anyway>;
 Sys::Binmode just enforces that better.
 
-=head2 Windows (et alia)
+=head2 Windows et alia
 
-NTFS, Windows’s primary filesystem, expects filenames to be encoded in
-little-endian UTF-16. To create a file named C<épée>, then, on NTFS
-you have to do something like:
+Filesystems on POSIX operating systems (e.g., Linux & macOS) don’t care about
+character encoding; they just store opaque octet sequences, and applications
+(e.g., Perl) have to sort out which octets are useful/meaningful and which
+aren’t.
 
-    my $windows_filename = Encode::Simple::encode( 'UTF-16LE', $filename );
-
-… where C<$filename> is a character (i.e., decoded) string.
-
-Other OSes and filesystems may have their own quirks; regardless, this
+Non-POSIX OSes like Windows often work differencely. Regardless, this
 module gives you a saner point of departure to address those
 than Perl’s default behaviour provides.
 

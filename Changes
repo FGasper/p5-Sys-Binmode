@@ -2,6 +2,7 @@ Revision history for Perl module Sys::Binmode
 
 0.02
 - Perl 5.14 is now supported.
+- Touch up documentation.
 - (internal) Deduplicate %^H key
 
 0.01 Tue, 2 March 2021
