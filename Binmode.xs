@@ -30,6 +30,7 @@ static OP* _wrapped_pp_##OPID(pTHX) {                       \
         dMARK_TOPMARK;                                      \
         dORIGMARK;                                          \
                                                             \
+        fprintf(stderr, "wrap op %d; mark: %p, sp: %p\n", OPID, MARK, SP); \
         while (++MARK <= SP)                                \
             if (SvPOK(*MARK))                               \
                 sv_utf8_downgrade(*MARK, FALSE);            \
