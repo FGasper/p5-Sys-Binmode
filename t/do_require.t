@@ -25,15 +25,7 @@ do {
     is( $@, q<>, 'do with upgraded string' );
 };
 
-TODO: {
-
-    # In testing, mark was 0x234f1cb98 and sp was 0x20e3010.
-    # This causes our wrapper function to think there are no args,
-    # so nothing gets downgraded.
-    #
-    # Only seen on Windows.
-    local $TODO = 'Windows MARK/SP bug?' if $^O =~ m<mswin>i;
-
+do {
     use Sys::Binmode;
 
     eval { require "$dir/require-$e_up.pl" };
