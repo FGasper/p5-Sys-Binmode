@@ -18,6 +18,8 @@ do { open my $w, '>', "$dir/require-$e_down.pl"; print {$w} 1 };
 my $e_up = $e_down;
 utf8::upgrade($e_up);
 
+print `dir $dir` if $^O =~ m<win>i;
+
 do {
     use Sys::Binmode;
 
