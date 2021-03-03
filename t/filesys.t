@@ -29,7 +29,7 @@ do {
     ok( fileno($rfh), 'open() with upgraded string' );
 };
 
-if ($^O =~ m<linux|darwin|bsd>i) {
+if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
     use Sys::Binmode;
 
     ok( (-e _get_path_up()), '-e with upgraded string' );
