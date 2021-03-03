@@ -77,21 +77,24 @@ use this module in **all** new code.
 # CAVEAT: CHARACTER ENCODING
 
 If you apply this module injudiciously to existing code you may see
-exceptions thrown where previously things worked just fine. This can
+exceptions or character corruption where previously things worked fine.
+
+This can
 happen if you’ve neglected to encode one or more strings before
-sending them to the OS; if Perl has such a string stored upgraded then
-Perl will, under default behavior, send a UTF-8-encoded
-version of that string to the OS. In essence, it’s an implicit
-UTF-8 auto-encode.
+sending them to the OS. Without Sys::Binmode, Perl sends upgraded
+strings to the OS in UTF-8 encoding. In essence, it’s an implicit
+UTF-8 auto-encode, which is kind of nice, except that it depends on
+Perl’s internals, which are unpredictable. Sys::Binmode removes
+that implicit UTF-8 auto-encode, which of course will break things
+that need it.
 
 The fix is to apply an explicit UTF-8 encode prior to the system call
 that throws the error. This is what we should do _anyway_;
 Sys::Binmode just enforces that better.
 
-## The [utf8](https://metacpan.org/pod/utf8) Pragma
+## Example: The [utf8](https://metacpan.org/pod/utf8) Pragma
 
-The widely-used [utf8](https://metacpan.org/pod/utf8) pragma creates some problems that this module
-can make more apparent.
+The widely-used [utf8](https://metacpan.org/pod/utf8) pragma particularly exemplifies this problem.
 
 If you have code like this:
 
@@ -116,7 +119,7 @@ this string is now UTF-8-decoded. Those 4 characters all lie beneath 256,
 so the string is still bytes-compatible. Thus, if you `print()` that string
 you’ll get 4 bytes of Latin-1, which probably **isn’t** what you want.
 
-`mkdir()`, though, _probably_ creates a directory with a 6-byte (UTF-8)
+`mkdir()`, though, _probably_ still creates a directory with a 6-byte (UTF-8)
 name. This happens when Perl itself stores `épée` in upgraded (i.e.,
 “unoptimized”) form. If that’s the case, that means Perl’s _internal_ buffer
 of `épée` is still the 6 bytes of UTF-8, even though to the Perl
@@ -127,10 +130,10 @@ happens to achieve something that is _sometimes_ useful.
 
 There are still two problems, though:
 
-- 1. `print()` sends 4 bytes to the OS while `mkdir()` (again,
-_probably_) outputs 6.
-- 2. `épée` _could_ be stored downgraded rather than upgraded,
-which would cause `mkdir()` to send 4 bytes instead.
+- 1. Inconsistency: `print()` sends 4 bytes to the OS while
+`mkdir()` (again, _probably_) outputs 6.
+- 2. Uncertainty: `épée` _could_ be stored downgraded rather than
+upgraded, which would cause `mkdir()` to send 4 bytes instead.
 
 `print()`’s outputting of 4 bytes here is actually the **correct** behavior
 because it doesn’t depend on whether Perl stores the string upgraded or
@@ -146,7 +149,7 @@ to the OS (as you should do anyway):
     mkdir encode_utf8("épée");
 
 Now adding Sys::Binmode to your module will change nothing. It _will_,
-though, make omitted encoding more apparent.
+though, make any future omitted-encoding bugs more apparent.
 
 ## Non-POSIX Operating Systems (e.g., Windows)
 
