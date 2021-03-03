@@ -25,6 +25,9 @@ do {
     is( $@, q<>, 'do with upgraded string' );
 };
 
+# Just in case …
+utf8::upgrade($e_up);
+
 do {
     use Sys::Binmode;
 
