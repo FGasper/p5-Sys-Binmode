@@ -82,16 +82,21 @@ The fix is to apply an explicit UTF-8 encode prior to the system call
 that throws the error. This is what we should do _anyway_;
 Sys::Binmode just enforces that better.
 
-## Windows et alia
+## Non-POSIX Operating Systems (e.g., Windows)
 
-Filesystems on POSIX operating systems (e.g., Linux & macOS) don’t care about
-character encoding; they just store opaque octet sequences, and applications
-(e.g., Perl) have to sort out which octets are useful/meaningful and which
-aren’t.
+In a POSIX operating system, an application’s communication with the
+OS happens entirely through byte strings. Thus, treating all
+OS-destined strings as byte strings is good and natural.
 
-Non-POSIX OSes like Windows often work differencely. Regardless, this
-module gives you a saner point of departure to address those
-than Perl’s default behaviour provides.
+In Windows, though, things are weirder. For example, Windows
+exposes multiple APIs for creating a directory, and the one Perl uses (as of
+5.32, anyway) only accepts code points 0-255. In this context Sys::Binmode
+doesn’t _break_ anything, but it does reinforce one of Perl’s unfortunate
+limitations on Windows.
+
+Sys::Binmode is a good idea anywhere that Perl sends byte strings to the OS.
+As far as I know, that’s everywhere that Perl runs. If that’s not true,
+please file a bug.
 
 # WHERE ELSE THIS PROBLEM CAN APPEAR
 
