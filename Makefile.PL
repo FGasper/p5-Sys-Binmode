@@ -16,6 +16,7 @@ WriteMakefile(
     INC               => '-Wall -I.', # e.g., '-I. -I/usr/include/other'
     LICENSE           => "perl_5",
 
+    # We need cop_hints_fetch_pvs(). (cf. Devel::PPPort)
     MIN_PERL_VERSION => '5.14.0',
 
     META_MERGE => {
