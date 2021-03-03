@@ -1,6 +1,6 @@
 # NAME
 
-Sys::Binmode - Fix Perl’s system call character encoding.
+Sys::Binmode - A fix for Perl’s system call character encoding
 
 <div>
     <a href='https://coveralls.io/github/FGasper/p5-Sys-Binmode?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Sys-Binmode/badge.svg?branch=master' alt='Coverage Status' /></a>

@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-Sys::Binmode - Fix Perl’s system call character encoding.
+Sys::Binmode - A fix for Perl’s system call character encoding
 
 =begin html
 
