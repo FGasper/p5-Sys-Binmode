@@ -10,15 +10,16 @@ Sys::Binmode - Fix Perl’s system call character encoding.
 
     use Sys::Binmode;
 
-    my $foo = "\xc3\xa9";   # é in UTF-8
+    my $foo = "\xff";
     $foo .= "\x{100}";
     chop $foo;
 
-    # Prints “é” in UTF-8:
+    # Prints a single octet (0xFF) and a newline:
     print $foo, $/;
 
-    # In Perl 5.32 this may print a double-UTF-8-encoded “é”,
-    # but with Sys::Binmode it always prints plain UTF-8 “é”:
+    # In Perl 5.32 this may print the same single octet, or it may
+    # print UTF-8-encoded U+00FF. With Sys::Binmode, though, it always
+    # gives the single octet, just like print:
     exec 'echo', $foo;
 
 # DESCRIPTION
