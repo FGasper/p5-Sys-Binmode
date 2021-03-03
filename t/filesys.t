@@ -91,7 +91,7 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
         'link with upgraded string',
     );
 
-    ok( (lstat _get_path_up())[0], 'lstat with upgraded string' );
+    ok( (lstat _get_path_up())[2], 'lstat with upgraded string' );
 
     mkdir( _get_path_up() . '-dir' );
 
@@ -123,7 +123,7 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
         'rmdir with upgraded string',
     );
 
-    ok( (stat _get_path_up())[0], 'stat with upgraded string' );
+    ok( (stat _get_path_up())[2], 'stat with upgraded string' );
 
     symlink 'haha', _get_path_up() . '-symlink';
     is(

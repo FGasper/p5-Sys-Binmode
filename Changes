@@ -2,6 +2,7 @@ Revision history for Perl module Sys::Binmode
 
 0.02
 - Perl 5.14 is now supported.
+- Fix filesystem tests on nonzero-numbered devices.
 - Remove static assets from do & require tests.
 - Touch up documentation.
 - (internal) Deduplicate %^H key
