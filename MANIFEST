@@ -16,5 +16,6 @@ t/exec_and_system.t
 t/filesys.t
 t/net.t
 t/net_setsockopt.t
+t/overloaded.t
 t/syscall.t
 t/unimport.t
