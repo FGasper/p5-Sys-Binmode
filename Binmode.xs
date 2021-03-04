@@ -23,17 +23,27 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
+#define DOWNGRADE_SVPV(sv) (SvPOK(sv) && sv_utf8_downgrade(sv, FALSE))
+
 static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
-    if (sv_isobject(*svp)) {
-        if ( HvAMAGIC(SvSTASH(SvRV(*svp)))) {
-            SV* replacement = sv_newmortal();
-            sv_copypv(replacement, *svp);
-            sv_utf8_downgrade(replacement, FALSE);
-            *svp = replacement;
-        }
+    if (UNLIKELY(SvGAMAGIC(*svp))) {
+
+        /* If the parameter in question is magical/overloaded
+           then we need to fetch the (string) value, downgrade it,
+           then replace the overloaded object in the stack with
+           our fetched value.
+        */
+
+        SV* replacement = sv_newmortal();
+
+        /* fetches the overloadeed value */
+        sv_copypv(replacement, *svp);
+
+        DOWNGRADE_SVPV(replacement);
+
+        *svp = replacement;
     }
-    else if (SvPOK(*svp))
-        sv_utf8_downgrade(*svp, FALSE);
+    else DOWNGRADE_SVPV(*svp);
 }
 
 #define MAKE_LIST_WRAPPER(OPID)                             \
@@ -55,7 +65,7 @@ static OP* _wrapped_pp_##OPID(pTHX) {                       \
 
 /* Ops that take only 1 arg don’t always set a mark. We can’t
    just iterate from MARK to SP in those cases; we just have to
-   grab *SP and go with it.
+   work with the stack pointer (SP) directly.
 */
 #define MAKE_SCALAR_WRAPPER(OPID)                           \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
