@@ -23,6 +23,19 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
+static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
+    if (sv_isobject(*svp)) {
+        if ( HvAMAGIC(SvSTASH(SvRV(*svp)))) {
+            SV* replacement = sv_newmortal();
+            sv_copypv(replacement, *svp);
+            sv_utf8_downgrade(replacement, FALSE);
+            *svp = replacement;
+        }
+    }
+    else if (SvPOK(*svp))
+        sv_utf8_downgrade(*svp, FALSE);
+}
+
 #define MAKE_LIST_WRAPPER(OPID)                             \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
@@ -32,9 +45,7 @@ static OP* _wrapped_pp_##OPID(pTHX) {                       \
         dMARK_TOPMARK;                                      \
         dORIGMARK;                                          \
                                                             \
-        while (++MARK <= SP)                                \
-            if (SvPOK(*MARK))                               \
-                sv_utf8_downgrade(*MARK, FALSE);            \
+        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
                                                             \
         MARK = ORIGMARK;                                    \
     }                                                       \
@@ -52,9 +63,7 @@ static OP* _wrapped_pp_##OPID(pTHX) {                       \
                                                             \
     if (svp != &PL_sv_placeholder) {                        \
         dSP;                                                \
-                                                            \
-        if (SvPOK(*SP))                                     \
-                sv_utf8_downgrade(*SP, FALSE);              \
+        MY_DOWNGRADE(aTHX_ SP);                             \
     }                                                       \
                                                             \
     return ORIG_PL_ppaddr[OPID](aTHX);                      \
