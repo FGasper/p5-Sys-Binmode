@@ -154,16 +154,19 @@ because it doesn’t depend on whether Perl stores the string upgraded or
 downgraded. Sys::Binmode extends that correct behavior to C<mkdir()> and
 other such Perl commands.
 
-To get what you want, just encode your string for output before you give it
-to the OS (as you should do anyway):
+Of course, in the end, we want C<mkdir()> to receive 6 bytes of UTF-8, not
+4 bytes of Latin-1. To achieve that, just do as you normally do with
+C<print()>: encode your string before you give it to the OS.
 
     use utf8;
     use Encode;
 
     mkdir encode_utf8("épée");
 
-Now adding Sys::Binmode to your module will change nothing. It I<will>,
-though, make any future omitted-encoding bugs more apparent.
+This is what your code should look like, regardless of Sys::Binmode;
+the omitted encoding step was a bug that Perl’s own abstraction-violation
+bug I<might> have obscured for you. Sys::Binmode fixes Perl’s bug,
+which makes you fix your own bug, too.
 
 =head2 Non-POSIX Operating Systems (e.g., Windows)
 
@@ -178,13 +181,13 @@ doesn’t I<break> anything, but it does reinforce one of Perl’s unfortunate
 limitations on Windows.
 
 Sys::Binmode is a good idea anywhere that Perl sends byte strings to the OS.
-As far as I know, that’s everywhere that Perl runs. If that’s not true,
-please file a bug.
+For now, as far as I know, that’s everywhere that Perl runs. If that’s not
+true, please file a bug.
 
 =head1 WHERE ELSE THIS PROBLEM CAN APPEAR
 
 The unpredictable-behavior problem that this module fixes in core Perl is
-also common in XS modules due to rampant
+also common in L<CPAN|http://cpan.org>’s XS modules due to rampant
 use of L<the SvPV macro|https://perldoc.perl.org/perlapi#SvPV> and
 variants. SvPV is like the L<bytes> pragma in C: it gives you the string’s
 internal bytes with no regard for what those bytes represent. XS authors

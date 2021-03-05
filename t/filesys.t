@@ -93,7 +93,7 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
 
     ok( (lstat _get_path_up())[2], 'lstat with upgraded string' );
 
-    mkdir( _get_path_up() . '-dir' );
+    mkdir( _get_path_up() . '-dir' ) or diag "mkdir: $!";
 
     ok(
         (-e "$dir/$e_down-dir"),
@@ -125,7 +125,7 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
 
     ok( (stat _get_path_up())[2], 'stat with upgraded string' );
 
-    symlink 'haha', _get_path_up() . '-symlink';
+    symlink 'haha', _get_path_up() . '-symlink' or diag "symlink: $!";
     is(
         (readlink "$dir/$e_down-symlink"),
         'haha',
@@ -154,8 +154,9 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
 
     mkdir( _get_path_up() . '-dir' );
 
+    my $chdir_ok = chdir( _get_path_up() . '-dir' ) or diag "chdir: $!";
     ok(
-        chdir( _get_path_up() . '-dir' ),
+        $chdir_ok,
         'chdir with upgraded string',
     );
 
