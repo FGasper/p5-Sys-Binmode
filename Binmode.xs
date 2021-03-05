@@ -23,7 +23,7 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
-#define DOWNGRADE_SVPV(sv) (SvPOK(sv) && sv_utf8_downgrade(sv, FALSE))
+#define DOWNGRADE_SVPV(sv) if (SvPOK(sv)) sv_utf8_downgrade(sv, FALSE)
 
 static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
     if (UNLIKELY(SvGAMAGIC(*svp))) {
