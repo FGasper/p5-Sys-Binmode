@@ -43,6 +43,8 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
 
         *svp = replacement;
     }
+
+    /* NB: READONLY strings can be downgraded. */
     else DOWNGRADE_SVPV(*svp);
 }
 
@@ -135,6 +137,7 @@ MAKE_LIST_WRAPPER(OP_OPEN_DIR);
 
 MAKE_SCALAR_WRAPPER(OP_REQUIRE);
 MAKE_SCALAR_WRAPPER(OP_DOFILE);
+MAKE_SCALAR_WRAPPER(OP_BACKTICK);
 
 /* (These appear to be fine already.)
 MAKE_SCALAR_WRAPPER(OP_GHBYADDR);
@@ -227,6 +230,7 @@ BOOT:
 
         MAKE_BOOT_WRAPPER(OP_REQUIRE);
         MAKE_BOOT_WRAPPER(OP_DOFILE);
+        MAKE_BOOT_WRAPPER(OP_BACKTICK);
 
         /* (These appear to be fine already.)
         MAKE_BOOT_WRAPPER(OP_GHBYADDR);
