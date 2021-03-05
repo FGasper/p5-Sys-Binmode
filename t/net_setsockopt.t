@@ -16,6 +16,8 @@ if (length $rcvbuf_bin == 4) {
     my $rcvbuf = unpack 'L', $rcvbuf_bin;
     my $rcvbuf_orig = $rcvbuf;
 
+    diag "Original SO_RCVBUF: $recvbuf_orig";
+
     my $newsize_bin = q<>;
 
     while ($rcvbuf > 0) {
@@ -43,7 +45,10 @@ if (length $rcvbuf_bin == 4) {
     if ($^O =~ m<linux>) {
 
         # Linux doubles the SO_RCVBUF that you give. (weird?)
-        is( $rcvbuf2, 2 * $rcvbuf, 'setsockopt took effect');
+        is( $rcvbuf2, 2 * $rcvbuf, 'setsockopt took effect (twice given value, because Linux)');
+    }
+    elsif ($^O =~ m<solaris>) {
+        isnt( $rcvbuf2, $orig_rcvbuf, 'setsockopt took effect (some change from before, because Solaris)');
     }
     else {
         is( $rcvbuf2, $rcvbuf, 'setsockopt took effect');
