@@ -204,7 +204,7 @@ you can disable this module for a given block via
 
 # AFFECTED BUILT-INS
 
-- `exec` and `system`
+- `exec`, `system`, and `readpipe`
 - `do` and `require`
 - File tests (e.g., `-e`) and the following:
 `chdir`, `chmod`, `chown`, `chroot`,

@@ -220,7 +220,7 @@ C<no Sys::Binmode>, thus:
 
 =over
 
-=item * C<exec> and C<system>
+=item * C<exec>, C<system>, and C<readpipe>
 
 =item * C<do> and C<require>
 
@@ -256,7 +256,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.02';
+our $VERSION = '0.03_01';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
