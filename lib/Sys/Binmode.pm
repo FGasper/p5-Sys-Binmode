@@ -161,7 +161,7 @@ C<print()>: encode your string before you give it to the OS.
     use utf8;
     use Encode;
 
-    mkdir encode_utf8("épée");
+    mkdir encode("UTF-8", "épée");
 
 This is what your code should look like, regardless of Sys::Binmode;
 the omitted encoding step was a bug that Perl’s own abstraction-violation
