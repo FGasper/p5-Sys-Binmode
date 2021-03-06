@@ -33,15 +33,11 @@ if (length $rcvbuf_bin == 4) {
 
     utf8::upgrade $newsize_bin;
 
-    {
-        use Sys::Binmode;
-        my $ok = setsockopt( $s, SOL_SOCKET, SO_RCVBUF, $newsize_bin );
-        my $err = $!;
-        ok(
-            $ok,
-            'setsockopt with upgraded string - no failure',
-        ) or diag $!;
-    }
+    use Sys::Binmode;
+    ok(
+        setsockopt( $s, SOL_SOCKET, SO_RCVBUF, $newsize_bin ),
+        'setsockopt with upgraded string - no failure',
+    );
 
     my $rcvbuf_bin = getsockopt($s, SOL_SOCKET, SO_RCVBUF);
     my $rcvbuf2= unpack 'L', $rcvbuf_bin;
