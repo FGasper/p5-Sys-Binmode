@@ -93,7 +93,9 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
 
     ok( (lstat _get_path_up())[2], 'lstat with upgraded string' );
 
-    mkdir( _get_path_up() . '-dir' ) or diag "mkdir: $!";
+    mkdir( _get_path_up() . '-dir' );
+
+    diag `ls -la $dir`;
 
     ok(
         (-e "$dir/$e_down-dir"),
