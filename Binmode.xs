@@ -23,10 +23,8 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
-#define DOWNGRADE_SVPV(sv) if (SvPOK(sv)) sv_utf8_downgrade(sv, FALSE)
-
 static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
-    if (UNLIKELY(SvGAMAGIC(*svp))) {
+    if (SvPOK(*svp) || UNLIKELY(SvGAMAGIC(*svp))) {
 
         /* If the parameter in question is magical/overloaded
            then we need to fetch the (string) value, downgrade it,
@@ -39,13 +37,10 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
         /* fetches the overloadeed value */
         sv_copypv(replacement, *svp);
 
-        DOWNGRADE_SVPV(replacement);
+        sv_utf8_downgrade(replacement, FALSE);
 
         *svp = replacement;
     }
-
-    /* NB: READONLY strings can be downgraded. */
-    else DOWNGRADE_SVPV(*svp);
 }
 
 #define MAKE_LIST_WRAPPER(OPID)                             \
