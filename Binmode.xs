@@ -23,8 +23,10 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
+#define DOWNGRADE_SVPV(sv) if (SvPOK(sv)) sv_utf8_downgrade(sv, FALSE)
+
 static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
-    if (SvPOK(*svp) || UNLIKELY(SvGAMAGIC(*svp))) {
+    if (UNLIKELY(SvGAMAGIC(*svp))) {
 
         /* If the parameter in question is magical/overloaded
            then we need to fetch the (string) value, downgrade it,
@@ -37,14 +39,20 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
         /* fetches the overloadeed value */
         sv_copypv(replacement, *svp);
 
-        sv_utf8_downgrade(replacement, FALSE);
+        DOWNGRADE_SVPV(replacement);
 
         *svp = replacement;
     }
+
+    /* NB: READONLY strings can be downgraded. */
+    else DOWNGRADE_SVPV(*svp);
 }
 
 #define MAKE_LIST_WRAPPER(OPID)                             \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
+if (OPID == OP_MKDIR) { \
+fprintf(stderr, "in mkdir wrapper\n"); \
+} \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp != &PL_sv_placeholder) {                        \
@@ -52,7 +60,10 @@ static OP* _wrapped_pp_##OPID(pTHX) {                       \
         dMARK_TOPMARK;                                      \
         dORIGMARK;                                          \
                                                             \
-        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
+        while (++MARK <= SP) { \
+if (OPID == OP_MKDIR) sv_dump(*MARK); \
+MY_DOWNGRADE(aTHX_ MARK);      \
+} \
                                                             \
         MARK = ORIGMARK;                                    \
     }                                                       \
@@ -144,6 +155,7 @@ MAKE_LIST_WRAPPER(OP_SYSCALL);
 /* ---------------------------------------------------------------------- */
 
 #define MAKE_BOOT_WRAPPER(OPID)         \
+if (OPID == OP_MKDIR) fprintf(stderr, "overwriting PL_ppaddr[OP_MKDIR] (%p) with %p)\n", PL_ppaddr[OPID], _wrapped_pp_##OPID); \
 ORIG_PL_ppaddr[OPID] = PL_ppaddr[OPID]; \
 PL_ppaddr[OPID] = _wrapped_pp_##OPID;
 
@@ -165,7 +177,7 @@ BOOT:
     OP_CHECK_MUTEX_LOCK;
 #endif
     if (!initialized) {
-        initialized = 1;
+        initialized = true;
 
         HV *stash = gv_stashpv(MYPKG, FALSE);
         newCONSTSUB(stash, "_HINT_KEY", newSVpvs(HINT_KEY));
