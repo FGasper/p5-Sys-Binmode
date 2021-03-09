@@ -67,9 +67,8 @@ static OP* _wrapped_pp_##OPID(pTHX) {                   \
         dSP;                                            \
         dMARK_TOPMARK;                                  \
                                                         \
-        /* Check OP_MAXARG so that the compiler will    \
-           optimize this out for                        \
-           MAKE_OPEN_LIST_WRAPPER.                      \
+        /* The compiler should optimize this away       \
+           for MAKE_OPEN_LIST_WRAPPER:                  \
         */                                              \
         if (OP_MAXARG) if ((SP - MARK) > OP_MAXARG) {   \
             unsigned numargs = MAXARG;                  \
