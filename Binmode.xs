@@ -7,6 +7,8 @@
 
 #include "ppport.h"
 
+#define DEBUG 0
+
 /* A duplicate of PL_ppaddr as we find it at BOOT time.
    We can thus overwrite PL_ppaddr with our own wrapper functions.
    This interacts better with wrap_op_checker(), which doesn’t provide
@@ -48,19 +50,40 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
     else DOWNGRADE_SVPV(*svp);
 }
 
-#define MAKE_LIST_WRAPPER(OPID)                             \
+#define MAKE_FIXED_LIST_WRAPPER(OPID, OP_MAXARG)            \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
-fprintf(stderr, "# in list wrapper: %s\n", PL_op_name[OPID]); \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp != &PL_sv_placeholder) {                        \
         dSP;                                                \
         dMARK_TOPMARK;                                      \
-        dORIGMARK;                                          \
+                                                            \
+        /* In some perls, some list opts don’t set MARK.    \
+           In those cases we fall back to MAXARG.           \
+           As of now mkdir and symlink are the known        \
+           “offenders”, and only on Alpine Linux 3.11.      \
+        */                                                  \
+        if ((SP - MARK) > OP_MAXARG) {                      \
+            unsigned numargs = MAXARG;                      \
+            MARK = SP;                                      \
+            while (numargs--) MARK--;                       \
+        }                                                   \
                                                             \
         while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
+    }                                                       \
                                                             \
-        MARK = ORIGMARK;                                    \
+    return ORIG_PL_ppaddr[OPID](aTHX);                      \
+}
+
+#define MAKE_OPEN_LIST_WRAPPER(OPID)                        \
+static OP* _wrapped_pp_##OPID(pTHX) {                       \
+    SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
+                                                            \
+    if (svp != &PL_sv_placeholder) {                        \
+        dSP;                                                \
+        dMARK_TOPMARK;                                      \
+                                                            \
+        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
     }                                                       \
                                                             \
     return ORIG_PL_ppaddr[OPID](aTHX);                      \
@@ -72,7 +95,6 @@ fprintf(stderr, "# in list wrapper: %s\n", PL_op_name[OPID]); \
 */
 #define MAKE_SP_WRAPPER(OPID)                           \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
-fprintf(stderr, "# in SP wrapper: %s\n", PL_op_name[OPID]); \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp != &PL_sv_placeholder) {                        \
@@ -84,11 +106,11 @@ fprintf(stderr, "# in SP wrapper: %s\n", PL_op_name[OPID]); \
 }
 
 
-MAKE_LIST_WRAPPER(OP_OPEN);
-MAKE_LIST_WRAPPER(OP_SYSOPEN);
-MAKE_LIST_WRAPPER(OP_TRUNCATE);
-MAKE_LIST_WRAPPER(OP_EXEC);
-MAKE_LIST_WRAPPER(OP_SYSTEM);
+MAKE_OPEN_LIST_WRAPPER(OP_OPEN);
+MAKE_FIXED_LIST_WRAPPER(OP_SYSOPEN, 4);
+MAKE_FIXED_LIST_WRAPPER(OP_TRUNCATE, 2);
+MAKE_OPEN_LIST_WRAPPER(OP_EXEC);
+MAKE_OPEN_LIST_WRAPPER(OP_SYSTEM);
 
 MAKE_SP_WRAPPER(OP_BIND);
 MAKE_SP_WRAPPER(OP_CONNECT);
@@ -124,16 +146,16 @@ MAKE_SP_WRAPPER(OP_FTLINK);
 MAKE_SP_WRAPPER(OP_FTTEXT);
 MAKE_SP_WRAPPER(OP_FTBINARY);
 MAKE_SP_WRAPPER(OP_CHDIR);
-MAKE_LIST_WRAPPER(OP_CHOWN);
+MAKE_OPEN_LIST_WRAPPER(OP_CHOWN);
 MAKE_SP_WRAPPER(OP_CHROOT);
-MAKE_LIST_WRAPPER(OP_UNLINK);
-MAKE_LIST_WRAPPER(OP_CHMOD);
-MAKE_LIST_WRAPPER(OP_UTIME);
-MAKE_LIST_WRAPPER(OP_RENAME);
-MAKE_LIST_WRAPPER(OP_LINK);
-MAKE_LIST_WRAPPER(OP_SYMLINK);
+MAKE_OPEN_LIST_WRAPPER(OP_UNLINK);
+MAKE_OPEN_LIST_WRAPPER(OP_CHMOD);
+MAKE_OPEN_LIST_WRAPPER(OP_UTIME);
+MAKE_FIXED_LIST_WRAPPER(OP_RENAME, 2);
+MAKE_FIXED_LIST_WRAPPER(OP_LINK, 2);
+MAKE_FIXED_LIST_WRAPPER(OP_SYMLINK, 2);
 MAKE_SP_WRAPPER(OP_READLINK);
-MAKE_LIST_WRAPPER(OP_MKDIR);
+MAKE_FIXED_LIST_WRAPPER(OP_MKDIR, 2);
 MAKE_SP_WRAPPER(OP_RMDIR);
 MAKE_SP_WRAPPER(OP_OPEN_DIR);
 
@@ -146,7 +168,7 @@ MAKE_SP_WRAPPER(OP_GHBYADDR);
 MAKE_SP_WRAPPER(OP_GNBYADDR);
 */
 
-MAKE_LIST_WRAPPER(OP_SYSCALL);
+MAKE_OPEN_LIST_WRAPPER(OP_SYSCALL);
 
 /* ---------------------------------------------------------------------- */
 
@@ -172,7 +194,6 @@ BOOT:
     OP_CHECK_MUTEX_LOCK;
 #endif
     if (!initialized) {
-        fprintf(stderr, "====== OVERWRITING PL_ppaddr\n");
         initialized = true;
 
         HV *stash = gv_stashpv(MYPKG, FALSE);

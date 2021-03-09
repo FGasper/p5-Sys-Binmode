@@ -97,8 +97,6 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
 
     mkdir( _get_path_up() . '-dir' );
 
-    diag `ls -la $dir`;
-
     ok(
         (-e "$dir/$e_down-dir"),
         'mkdir with upgraded string',
