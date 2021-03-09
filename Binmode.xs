@@ -25,7 +25,7 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
-#define DOWNGRADE_SVPV(sv) if (SvPOK(sv)) sv_utf8_downgrade(sv, FALSE)
+#define DOWNGRADE_SVPV(sv) if (SvPOK(sv) && SvUTF8(sv)) sv_utf8_downgrade(sv, FALSE)
 
 static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
     if (UNLIKELY(SvGAMAGIC(*svp))) {
@@ -58,8 +58,8 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
 /* For ops whose number of string args is a fixed range.
 
    NB: In some perls, some list opts don’t set MARK. In those cases we
-   fall back to MAXARG. As of now mkdir and symlink are the known
-   “offenders”, and only on Alpine Linux 3.11.
+   fall back to MAXARG. As of now mkdir is the known “offender”, and
+   only on Alpine Linux 3.11 & 3.12 (not 3.13).
 */
 #define MAKE_CAPPED_LIST_WRAPPER(OPID, OP_MAXARG)       \
 static OP* _wrapped_pp_##OPID(pTHX) {                   \
@@ -70,11 +70,12 @@ static OP* _wrapped_pp_##OPID(pTHX) {                   \
         /* The compiler should optimize this away       \
            for MAKE_OPEN_LIST_WRAPPER:                  \
         */                                              \
-        if (OP_MAXARG) if ((SP - MARK) > OP_MAXARG) {   \
-            unsigned numargs = MAXARG;                  \
-            MARK = SP;                                  \
-            while (numargs--) MARK--;                   \
-        }                                               \
+        if (OP_MAXARG)                                  \
+            if (SP < MARK || (SP - MARK) > OP_MAXARG) { \
+                unsigned numargs = MAXARG;              \
+                MARK = SP;                              \
+                while (numargs--) MARK--;               \
+            }                                           \
                                                         \
         while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);  \
     }                                                   \
