@@ -12,6 +12,8 @@ plan skip_all => "This test needs UNIX sockets. (Unavailable via Socket.pm on $^
 
 plan skip_all => "Skipping on this OS ($^O)" if $^O !~ m<linux|darwin|bsd>;
 
+$| = 1;
+
 use File::Temp;
 
 my $dir = File::Temp::tempdir( CLEANUP => 1 );

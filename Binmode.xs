@@ -50,9 +50,7 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
 
 #define MAKE_LIST_WRAPPER(OPID)                             \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
-if (OPID == OP_MKDIR) { \
-fprintf(stderr, "in mkdir wrapper\n"); \
-} \
+fprintf(stderr, "# in list wrapper: %s\n", PL_op_name[OPID]); \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp != &PL_sv_placeholder) {                        \
@@ -60,10 +58,7 @@ fprintf(stderr, "in mkdir wrapper\n"); \
         dMARK_TOPMARK;                                      \
         dORIGMARK;                                          \
                                                             \
-        while (++MARK <= SP) { \
-if (OPID == OP_MKDIR) sv_dump(*MARK); \
-MY_DOWNGRADE(aTHX_ MARK);      \
-} \
+        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
                                                             \
         MARK = ORIGMARK;                                    \
     }                                                       \
@@ -77,6 +72,7 @@ MY_DOWNGRADE(aTHX_ MARK);      \
 */
 #define MAKE_SP_WRAPPER(OPID)                           \
 static OP* _wrapped_pp_##OPID(pTHX) {                       \
+fprintf(stderr, "# in SP wrapper: %s\n", PL_op_name[OPID]); \
     SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
                                                             \
     if (svp != &PL_sv_placeholder) {                        \
@@ -155,7 +151,6 @@ MAKE_LIST_WRAPPER(OP_SYSCALL);
 /* ---------------------------------------------------------------------- */
 
 #define MAKE_BOOT_WRAPPER(OPID)         \
-if (OPID == OP_MKDIR) fprintf(stderr, "overwriting PL_ppaddr[OP_MKDIR] (%p) with %p)\n", PL_ppaddr[OPID], _wrapped_pp_##OPID); \
 ORIG_PL_ppaddr[OPID] = PL_ppaddr[OPID]; \
 PL_ppaddr[OPID] = _wrapped_pp_##OPID;
 
@@ -177,6 +172,7 @@ BOOT:
     OP_CHECK_MUTEX_LOCK;
 #endif
     if (!initialized) {
+        fprintf(stderr, "====== OVERWRITING PL_ppaddr\n");
         initialized = true;
 
         HV *stash = gv_stashpv(MYPKG, FALSE);

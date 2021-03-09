@@ -1,9 +1,9 @@
 Revision history for Perl module Sys::Binmode
 
 0.03
-- This now handles readpipe/qx/backticks.
 - FIX: This now handles overloaded stringification.
 - FIX: This now handles multi-arg unlink().
+- This now handles readpipe/qx/backticks.
 - Skip local-socket-dependent tests if we can’t bind().
 - Fix setsockopt test on Solaris.
 - More documentation improvements.

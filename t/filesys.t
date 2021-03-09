@@ -10,6 +10,8 @@ use File::Temp;
 use Errno;
 use Fcntl;
 
+$| = 1;
+
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
 my $e_down = "é";

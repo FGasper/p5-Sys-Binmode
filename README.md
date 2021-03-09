@@ -175,17 +175,21 @@ true, please file a bug.
 The unpredictable-behavior problem that this module fixes in core Perl is
 also common in [CPAN](http://cpan.org)’s XS modules due to rampant
 use of [the SvPV macro](https://perldoc.perl.org/perlapi#SvPV) and
-variants. SvPV is like the [bytes](https://metacpan.org/pod/bytes) pragma in C: it gives you the string’s
-internal bytes with no regard for what those bytes represent. XS authors
+variants. SvPV is basically Perl’s [bytes](https://metacpan.org/pod/bytes) pragma in C: it gives
+you the string’s
+internal bytes with no regard for what those bytes represent. This, of course,
+is problematic for the same reason why the [bytes](https://metacpan.org/pod/bytes) pragma is. XS authors
 _generally_ should prefer
 [SvPVbyte](https://perldoc.perl.org/perlapi#SvPVbyte)
 or [SvPVutf8](https://perldoc.perl.org/perlapi#SvPVutf8) in lieu of
-SvPV unless the C code in question deals with Perl’s encoding abstraction.
+SvPV unless the C code in question handles Perl’s encoding abstraction.
 
 Note in particular that, as of Perl 5.32, the default XS typemap converts
 scalars to C `char *` and `const char *` via an SvPV variant. This means
 that any module that uses that conversion logic also has this problem.
 So XS authors should also avoid the default typemap for such conversions.
+(Again, though, use of the default typemap in this context is regrettably
+commonplace.)
 
 # LEXICAL SCOPING
 
