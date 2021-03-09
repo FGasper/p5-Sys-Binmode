@@ -1,6 +1,7 @@
 Revision history for Perl module Sys::Binmode
 
 0.03
+- FIX: Segfault in Alpine Linux 3.11 (and others?).
 - FIX: This now handles overloaded stringification.
 - FIX: This now handles multi-arg unlink().
 - This now handles readpipe/qx/backticks.
