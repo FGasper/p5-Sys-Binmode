@@ -50,64 +50,65 @@ static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
     else DOWNGRADE_SVPV(*svp);
 }
 
-#define MAKE_FIXED_LIST_WRAPPER(OPID, OP_MAXARG)            \
-static OP* _wrapped_pp_##OPID(pTHX) {                       \
-    SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
-                                                            \
-    if (svp != &PL_sv_placeholder) {                        \
-        dSP;                                                \
-        dMARK_TOPMARK;                                      \
-                                                            \
-        /* In some perls, some list opts don’t set MARK.    \
-           In those cases we fall back to MAXARG.           \
-           As of now mkdir and symlink are the known        \
-           “offenders”, and only on Alpine Linux 3.11.      \
-        */                                                  \
-        if ((SP - MARK) > OP_MAXARG) {                      \
-            unsigned numargs = MAXARG;                      \
-            MARK = SP;                                      \
-            while (numargs--) MARK--;                       \
-        }                                                   \
-                                                            \
-        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
-    }                                                       \
-                                                            \
-    return ORIG_PL_ppaddr[OPID](aTHX);                      \
-}
+#define BINMODE_IS_ON (cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0) != &PL_sv_placeholder)
 
-#define MAKE_OPEN_LIST_WRAPPER(OPID)                        \
-static OP* _wrapped_pp_##OPID(pTHX) {                       \
-    SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
-                                                            \
-    if (svp != &PL_sv_placeholder) {                        \
-        dSP;                                                \
-        dMARK_TOPMARK;                                      \
-                                                            \
-        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);      \
-    }                                                       \
-                                                            \
-    return ORIG_PL_ppaddr[OPID](aTHX);                      \
-}
+/* For ops that take an indefinite number of args. */
+#define MAKE_OPEN_LIST_WRAPPER(OPID) MAKE_CAPPED_LIST_WRAPPER(OPID, 0)
 
-/* Ops that take only 1 arg don’t always set a mark. We can’t
-   just iterate from MARK to SP in those cases; we just have to
-   work with the stack pointer (SP) directly.
+/* For ops whose number of string args is a fixed range.
+
+   NB: In some perls, some list opts don’t set MARK. In those cases we
+   fall back to MAXARG. As of now mkdir and symlink are the known
+   “offenders”, and only on Alpine Linux 3.11.
 */
-#define MAKE_SP_WRAPPER(OPID)                           \
-static OP* _wrapped_pp_##OPID(pTHX) {                       \
-    SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
-                                                            \
-    if (svp != &PL_sv_placeholder) {                        \
-        dSP;                                                \
-        MY_DOWNGRADE(aTHX_ SP);                             \
-    }                                                       \
-                                                            \
-    return ORIG_PL_ppaddr[OPID](aTHX);                      \
+#define MAKE_CAPPED_LIST_WRAPPER(OPID, OP_MAXARG)       \
+static OP* _wrapped_pp_##OPID(pTHX) {                   \
+    if (BINMODE_IS_ON) {                                \
+        dSP;                                            \
+        dMARK_TOPMARK;                                  \
+                                                        \
+        /* Check OP_MAXARG so that the compiler will    \
+           optimize this out for                        \
+           MAKE_OPEN_LIST_WRAPPER.                      \
+        */                                              \
+        if (OP_MAXARG) if ((SP - MARK) > OP_MAXARG) {   \
+            unsigned numargs = MAXARG;                  \
+            MARK = SP;                                  \
+            while (numargs--) MARK--;                   \
+        }                                               \
+                                                        \
+        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);  \
+    }                                                   \
+                                                        \
+    return ORIG_PL_ppaddr[OPID](aTHX);                  \
+}
+
+/* For ops that take a fixed number of args. */
+#define MAKE_FIXED_LIST_WRAPPER(OPID, NUMARGS)      \
+static OP* _wrapped_pp_##OPID(pTHX) {               \
+    if (BINMODE_IS_ON) {                            \
+        unsigned numargs = NUMARGS;                 \
+        dSP;                                        \
+        while (numargs--) MY_DOWNGRADE(aTHX_ SP--); \
+    }                                               \
+                                                    \
+    return ORIG_PL_ppaddr[OPID](aTHX);              \
+}
+
+/* For ops where only the last arg is a string. */
+#define MAKE_SP_WRAPPER(OPID)           \
+static OP* _wrapped_pp_##OPID(pTHX) {   \
+    if (BINMODE_IS_ON) {                \
+        dSP;                            \
+        MY_DOWNGRADE(aTHX_ SP);         \
+    }                                   \
+                                        \
+    return ORIG_PL_ppaddr[OPID](aTHX);  \
 }
 
 
 MAKE_OPEN_LIST_WRAPPER(OP_OPEN);
-MAKE_FIXED_LIST_WRAPPER(OP_SYSOPEN, 4);
+MAKE_CAPPED_LIST_WRAPPER(OP_SYSOPEN, 4);
 MAKE_FIXED_LIST_WRAPPER(OP_TRUNCATE, 2);
 MAKE_OPEN_LIST_WRAPPER(OP_EXEC);
 MAKE_OPEN_LIST_WRAPPER(OP_SYSTEM);
@@ -155,7 +156,7 @@ MAKE_FIXED_LIST_WRAPPER(OP_RENAME, 2);
 MAKE_FIXED_LIST_WRAPPER(OP_LINK, 2);
 MAKE_FIXED_LIST_WRAPPER(OP_SYMLINK, 2);
 MAKE_SP_WRAPPER(OP_READLINK);
-MAKE_FIXED_LIST_WRAPPER(OP_MKDIR, 2);
+MAKE_CAPPED_LIST_WRAPPER(OP_MKDIR, 2);
 MAKE_SP_WRAPPER(OP_RMDIR);
 MAKE_SP_WRAPPER(OP_OPEN_DIR);
 
