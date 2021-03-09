@@ -112,15 +112,19 @@ do {
     # In case mkdir created the wrong-named directory, we delete
     # whatever it created and create the path we want to exist:
     if ($exists) {
-        rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!";
+        rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!, $^E";
     }
 
     mkdir "$dir/$e_down-dir";
 
-    ok(
-        opendir( my $dh, _get_path_up() . '-dir' ),
-        'opendir with upgraded string',
-    );
+    {
+        ok(
+            opendir( my $dh, _get_path_up() . '-dir' ),
+            'opendir with upgraded string',
+        );
+
+        closedir $dh;
+    }
 
   SKIP: {
         skip "No readlink in $^O" if !$Config{'d_readlink'};
@@ -142,8 +146,9 @@ do {
         'rename with upgraded string',
     );
 
+    my $removed_ok = rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!, $^E";
     ok(
-        rmdir( _get_path_up() . '-dir' ),
+        $removed_ok,
         'rmdir with upgraded string',
     );
 
