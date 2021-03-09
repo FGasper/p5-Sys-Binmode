@@ -23,7 +23,8 @@ my $oldcwd = Cwd::cwd();
 
 chdir $dir;
 
-my $cmd = qq<$^X é>;
+# Quotes are for Windows.
+my $cmd = qq<"$^X" é>;
 
 utf8::upgrade($cmd);
 
