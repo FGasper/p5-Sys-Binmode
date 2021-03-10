@@ -263,7 +263,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.03_07';
+our $VERSION = '0.03_08';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
