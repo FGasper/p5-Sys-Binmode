@@ -127,7 +127,7 @@ do {
     }
 
   SKIP: {
-        skip "No readlink in $^O" if !$Config{'d_readlink'};
+        skip "No readlink in $^O", 1 if !$Config{'d_readlink'};
 
         () = readlink _get_path_up();
         is( 0 + $!, Errno::EINVAL, 'readlink with upgraded string' );
@@ -155,7 +155,7 @@ do {
     ok( (stat _get_path_up())[2], 'stat with upgraded string' );
 
     SKIP: {
-        skip "No symlink() in $^O" if !$Config{'d_symlink'};
+        skip "No symlink() in $^O", 1 if !$Config{'d_symlink'};
 
         symlink 'haha', _get_path_up() . '-symlink' or diag "symlink: $!";
         is(

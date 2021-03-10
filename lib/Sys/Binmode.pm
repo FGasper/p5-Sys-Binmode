@@ -205,6 +205,9 @@ So XS authors should also avoid the default typemap for such conversions.
 (Again, though, use of the default typemap in this context is regrettably
 commonplace.)
 
+Before Perl 5.18 this problem also affected %ENV. 5.18 introduced
+an auto-downgrade when setting %ENV similar to what this module does.
+
 =head1 LEXICAL SCOPING
 
 If, for some reason, you I<want> Perl’s unpredictable default behavior,
