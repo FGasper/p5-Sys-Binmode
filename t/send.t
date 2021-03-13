@@ -22,8 +22,10 @@ diag sprintf("bound to $addr:$port (%v.02x)", $fulladdr);
 
 socket my $ss, AF_INET, SOCK_DGRAM, 0;
 
+my $destaddr = Socket::pack_sockaddr_in($port, "\x7f\0\0\1");
+
 utf8::upgrade $fulladdr;
-my $ok = send $ss, $fulladdr, 0, $fulladdr;
+my $ok = send $ss, $fulladdr, 0, $destaddr;
 my $errs = "$!, $^E";
 
 SKIP: {
