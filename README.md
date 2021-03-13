@@ -221,7 +221,7 @@ you can disable this module for a given block via
 `link`, `lstat`, `mkdir`, `open`, `opendir`, `readlink`, `rename`,
 `rmdir`, `stat`, `symlink`, `sysopen`, `truncate`,
 `unlink`, `utime`
-- `bind`, `connect`, and `setsockopt`
+- `bind`, `connect`, `setsockopt`, and `send` (last argument)
 - `syscall`
 
 # TODO

@@ -240,7 +240,7 @@ C<link>, C<lstat>, C<mkdir>, C<open>, C<opendir>, C<readlink>, C<rename>,
 C<rmdir>, C<stat>, C<symlink>, C<sysopen>, C<truncate>,
 C<unlink>, C<utime>
 
-=item * C<bind>, C<connect>, and C<setsockopt>
+=item * C<bind>, C<connect>, C<setsockopt>, and C<send> (last argument)
 
 =item * C<syscall>
 
