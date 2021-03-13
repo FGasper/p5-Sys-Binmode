@@ -19,5 +19,6 @@ t/net.t
 t/net_setsockopt.t
 t/overloaded.t
 t/readpipe.t
+t/send.t
 t/syscall.t
 t/unimport.t
