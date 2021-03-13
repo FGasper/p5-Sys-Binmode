@@ -12,16 +12,31 @@ use Sys::Binmode;
 
 socket my $ls, AF_INET, SOCK_DGRAM, 0;
 setsockopt $ls, SOL_SOCKET, SO_REUSEADDR, 1;
+bind $ls, Socket::pack_sockaddr_in( 0, "\0\0\0\0" ) or die "bind: $^E";
+
+my $fulladdr = getsockname $ls;
+
+my ($port, $addr) = Socket::unpack_sockaddr_in($fulladdr);
+$addr = Socket::inet_ntoa($addr);
+diag sprintf("bound to $addr:$port (%v.02x)", $fulladdr);
 
 socket my $ss, AF_INET, SOCK_DGRAM, 0;
 
-my $addr = Socket::pack_sockaddr_in( 2000, Socket::inet_aton("244.0.0.0") );
-utf8::upgrade $addr;
-
-my $ok = send $ss, $addr, 0, $addr;
+utf8::upgrade $fulladdr;
+my $ok = send $ss, $fulladdr, 0, $fulladdr;
 my $errs = "$!, $^E";
 
-ok( $ok, 'send() succeeded' ) or diag $errs;
+SKIP: {
+    ok( $ok, 'send() succeeded' ) or do {
+        diag $errs;
+        skip "cannot proceed", 1;
+    };
+
+    my $from = recv( $ls, my $buf, 512, 0 );
+
+    alarm 10;
+    is($buf, $fulladdr, 'send() sent to the right place');
+};
 
 done_testing();
 
