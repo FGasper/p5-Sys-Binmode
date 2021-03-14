@@ -226,6 +226,7 @@ you can disable this module for a given block via
 
 # TODO
 
+- `crypt`, `select`?, `ioctl`
 - `dbmopen` and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 - There’s room for optimization, if that’s gainful.
