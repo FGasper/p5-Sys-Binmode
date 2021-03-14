@@ -250,6 +250,8 @@ C<unlink>, C<utime>
 
 =over
 
+=item * C<crypt>, C<select>?, C<ioctl>
+
 =item * C<dbmopen> and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 
