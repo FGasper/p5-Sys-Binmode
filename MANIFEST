@@ -15,6 +15,7 @@ t/constant.t
 t/do_require.t
 t/exec_and_system.t
 t/filesys.t
+t/ioctl.t
 t/net.t
 t/net_setsockopt.t
 t/overloaded.t

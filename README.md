@@ -217,16 +217,22 @@ you can disable this module for a given block via
 - `exec`, `system`, and `readpipe`
 - `do` and `require`
 - File tests (e.g., `-e`) and the following:
-`chdir`, `chmod`, `chown`, `chroot`,
+`chdir`, `chmod`, `chown`, `chroot`, `ioctl`,
 `link`, `lstat`, `mkdir`, `open`, `opendir`, `readlink`, `rename`,
 `rmdir`, `stat`, `symlink`, `sysopen`, `truncate`,
 `unlink`, `utime`
 - `bind`, `connect`, `setsockopt`, and `send` (last argument)
 - `syscall`
 
+## Omissions
+
+- `crypt` already does as Sys::Binmode would make it do.
+- `select` (the 4-argument one) has the bug that Sys::Binmode fixes,
+but since it’s a performance-sensitive call where upgraded strings are
+unlikely, this library doesn’t wrap it.
+
 # TODO
 
-- `crypt`, `select`?, `ioctl`
 - `dbmopen` and the System V IPC functions aren’t covered here.
 If you’d like them, ask.
 - There’s room for optimization, if that’s gainful.

@@ -235,7 +235,7 @@ C<no Sys::Binmode>, thus:
 =item * C<do> and C<require>
 
 =item * File tests (e.g., C<-e>) and the following:
-C<chdir>, C<chmod>, C<chown>, C<chroot>,
+C<chdir>, C<chmod>, C<chown>, C<chroot>, C<ioctl>,
 C<link>, C<lstat>, C<mkdir>, C<open>, C<opendir>, C<readlink>, C<rename>,
 C<rmdir>, C<stat>, C<symlink>, C<sysopen>, C<truncate>,
 C<unlink>, C<utime>
@@ -246,11 +246,21 @@ C<unlink>, C<utime>
 
 =back
 
-=head1 TODO
+=head2 Omissions
 
 =over
 
-=item * C<crypt>, C<select>?, C<ioctl>
+=item * C<crypt> already does as Sys::Binmode would make it do.
+
+=item * C<select> (the 4-argument one) has the bug that Sys::Binmode fixes,
+but since it’s a performance-sensitive call where upgraded strings are
+unlikely, this library doesn’t wrap it.
+
+=back
+
+=head1 TODO
+
+=over
 
 =item * C<dbmopen> and the System V IPC functions aren’t covered here.
 If you’d like them, ask.

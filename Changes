@@ -2,6 +2,7 @@ Revision history for Perl module Sys::Binmode
 
 0.04
 - This now handles the TO argument to send().
+- This now handles ioctl().
 
 0.03 Wed, 10 March 2021
 - FIX: Segfault in Alpine Linux 3.11 & 3.12 (maybe others?).

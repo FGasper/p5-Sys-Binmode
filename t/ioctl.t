@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use autodie;
+use Sys::Binmode;
 
 use Test::More;
 use Test::FailWarnings;
@@ -14,29 +14,28 @@ eval { require IO::Pty } or plan skip_all => "No IO::Pty ($@)";
 
 # cf. ioctl_list(4)
 use constant {
-    TCGETS => 0x00005401,
-    TCSETS => 0x00005402,
+    TIOCGWINSZ => 0x00005413,
+    TIOCSWINSZ => 0x00005414,
 };
 
+my $pack_tmpl = 'S!4';
+my $empty = pack $pack_tmpl;
+
+my $packed = pack $pack_tmpl, (255) x 4;
+utf8::upgrade $packed;
+
 my $pty = IO::Pty->new();
+ioctl $pty, TIOCSWINSZ, $packed;
+substr($packed, length $empty) = q<>;
 
-my $val;
-ioctl $pty, TCGETS, $val;
+my $val = $empty;
+ioctl $pty, TIOCGWINSZ, $val;
 
-diag sprintf "PTY TCGETS: %v.02x\n", $val;
+substr($val, length $empty) = q<>;
 
-my $copy = $val;
-
-utf8::upgrade($copy);
-ioctl $pty, TCSETS, $copy;
-
-my $val2;
-ioctl $pty, TCGETS, $val2;
-
-is(
-    sprintf('%v.02x', $val2),
-    sprintf('%v.02x', $val),
-    'ioctl downgraded its argument',
-);
+is( $val, $packed, 'ioctl downgraded its argument') or do {
+        diag sprintf 'got: %v.02x', $val;
+        diag sprintf 'wanted: %v.02x', $packed;
+};
 
 done_testing();
