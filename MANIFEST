@@ -11,6 +11,7 @@ Makefile.PL
 README.md
 lib/Sys/Binmode.pm
 ppport.h
+t/autodie.t
 t/constant.t
 t/do_require.t
 t/exec_and_system.t
