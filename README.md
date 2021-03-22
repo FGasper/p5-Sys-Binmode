@@ -231,6 +231,15 @@ you can disable this module for a given block via
 but since it’s a performance-sensitive call where upgraded strings are
 unlikely, this library doesn’t wrap it.
 
+# KNOWN ISSUES
+
+[autodie](https://metacpan.org/pod/autodie) creates functions named, e.g., `chmod` in the
+namespace of the module that `import()`s it. Those functions lack
+the compiler “hint” that tells Sys::Binmode to do its work; thus,
+[autodie “clobbers” Sys::Binmode](https://github.com/pjf/autodie/issues/113).
+`CORE::*` functions will still have Sys::Binmode, but of course they won’t
+throw exceptions.
+
 # TODO
 
 - `dbmopen` and the System V IPC functions aren’t covered here.

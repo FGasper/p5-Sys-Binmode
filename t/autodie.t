@@ -27,7 +27,7 @@ open my $wfh, '>', "$dir/$e_down";
 
 sub _get_path_up { "$dir/$e_up" }
 
-do {
+{
     use Sys::Binmode;
 
     eval { chmod 0644, _get_path_up() or die $! };
@@ -37,7 +37,7 @@ do {
         local $TODO = 'autodie bug';
         is( $err, q<>, 'chmod() with upgraded string' ) or diag $err;
     }
-};
+}
 
 done_testing();
 

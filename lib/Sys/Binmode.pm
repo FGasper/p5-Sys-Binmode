@@ -258,6 +258,15 @@ unlikely, this library doesn’t wrap it.
 
 =back
 
+=head1 KNOWN ISSUES
+
+L<autodie> creates functions named, e.g., C<chmod> in the
+namespace of the module that C<import()>s it. Those functions lack
+the compiler “hint” that tells Sys::Binmode to do its work; thus,
+L<autodie “clobbers” Sys::Binmode|https://github.com/pjf/autodie/issues/113>.
+C<CORE::*> functions will still have Sys::Binmode, but of course they won’t
+throw exceptions.
+
 =head1 TODO
 
 =over
@@ -278,7 +287,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.04_02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
