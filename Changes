@@ -1,6 +1,7 @@
 Revision history for Perl module Sys::Binmode
 
 0.05
+- Fix builds with MSVC.
 - Fix symlink test in recent Win32/Perl combos.
 
 0.04 Sun, 21 March 2021
